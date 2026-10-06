@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Модуль 1 — сетевая инфраструктура · стенд au-team.irpo</title>
+<meta name="description" content="Документация сети и команды настройки учебного стенда (ALT Linux) в порядке заданий демоэкзамена 09.02.06. Команды пересобираются под ваши параметры сети.">
+<meta name="theme-color" content="#121212">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="alt stass · стенд au-team.irpo">
+<meta property="og:title" content="Модуль 1 — сетевая инфраструктура · стенд au-team.irpo">
+<meta property="og:description" content="Документация сети и команды настройки стенда ДЭ 09.02.06 (ALT Linux) с копированием в один клик.">
+<meta property="og:url" content="https://pankstass.github.io/AltStass/">
+<meta property="og:image" content="https://pankstass.github.io/AltStass/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/favicon.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="m1">
+<a class="skip" href="#cmds">К командам</a>
+<div class="wrap">
+<aside aria-label="Навигация">
+<a class="logo" href="index.html" aria-label="alt stass — на главную"><img src="assets/logo.webp" alt="alt stass" width="360" height="319"></a>
+<nav class="mods" aria-label="Модули"><a href="index.html" aria-current="page">Модуль 1</a><a href="module2.html" >Модуль 2</a></nav>
+<button type="button" class="pbtn side" data-open-params>⚙ Параметры сети</button>
+<div class="lbl">Документация</div>
+<ul class="toc">
+<li><a href="#topology"><span class="n">·</span><span class="tt">Топология</span></a></li>
+<li><a href="#vms"><span class="n">·</span><span class="tt">Виртуальные машины</span></a></li>
+<li><a href="#addr"><span class="n">·</span><span class="tt">IP-адресация</span></a></li>
+<li><a href="#vlan"><span class="n">·</span><span class="tt">VLAN и подсети</span></a></li>
+<li><a href="#services"><span class="n">·</span><span class="tt">Службы и учётки</span></a></li>
+<li><a href="#dns"><span class="n">·</span><span class="tt">DNS-записи</span></a></li>
+</ul>
+<div class="lbl">Команды <span class="prog-txt" data-prog-txt></span></div>
+<ul class="toc">
+<li><a href="#prep" data-step="prep"><span class="n">0</span><span class="tt">Подготовка стенда</span><span class="cnt" data-cnt="prep"></span></a></li>
+<li><a href="#t1" data-step="t1"><span class="n">1</span><span class="tt">Базовая настройка устройств</span><span class="cnt" data-cnt="t1"></span></a></li>
+<li><a href="#t2" data-step="t2"><span class="n">2</span><span class="tt">Доступ в Интернет на ISP</span><span class="cnt" data-cnt="t2"></span></a></li>
+<li><a href="#t3" data-step="t3"><span class="n">3</span><span class="tt">Локальные учётные записи</span><span class="cnt" data-cnt="t3"></span></a></li>
+<li><a href="#t4" data-step="t4"><span class="n">4</span><span class="tt">Коммутация в сегменте HQ (VLAN)</span><span class="cnt" data-cnt="t4"></span></a></li>
+<li><a href="#t5" data-step="t5"><span class="n">5</span><span class="tt">Безопасный удалённый доступ (SSH)</span><span class="cnt" data-cnt="t5"></span></a></li>
+<li><a href="#t6" data-step="t6"><span class="n">6</span><span class="tt">IP-туннель GRE</span><span class="cnt" data-cnt="t6"></span></a></li>
+<li><a href="#t7" data-step="t7"><span class="n">7</span><span class="tt">Динамическая маршрутизация OSPF</span><span class="cnt" data-cnt="t7"></span></a></li>
+<li><a href="#t8" data-step="t8"><span class="n">8</span><span class="tt">Динамическая трансляция адресов (NAT)</span><span class="cnt" data-cnt="t8"></span></a></li>
+<li><a href="#t9" data-step="t9"><span class="n">9</span><span class="tt">DHCP для HQ-CLI</span><span class="cnt" data-cnt="t9"></span></a></li>
+<li><a href="#t10" data-step="t10"><span class="n">10</span><span class="tt">DNS (BIND на HQ-SRV)</span><span class="cnt" data-cnt="t10"></span></a></li>
+<li><a href="#t11" data-step="t11"><span class="n">11</span><span class="tt">Часовой пояс</span><span class="cnt" data-cnt="t11"></span></a></li>
+<li><a href="#check" data-step="check"><span class="n">✓</span><span class="tt">Итоговая проверка</span><span class="cnt" data-cnt="check"></span></a></li>
+</ul>
+<button type="button" class="linkbtn reset-done" data-reset-done>Сбросить отметки «готово»</button>
+</aside>
+<main>
+<header>
+<img class="mlogo" src="assets/logo.webp" alt="alt stass" width="360" height="319">
+<nav class="mods mmods" aria-label="Модули"><a href="index.html" aria-current="page">Модуль 1</a><a href="module2.html" >Модуль 2</a></nav>
+<h1>Учебный стенд <em>au-team.irpo</em></h1>
+<p>Документация сети и команды настройки — в порядке заданий демоэкзамена КИМ 09.02.06-1-2027, профильный уровень, Модуль 1.</p>
+<div class="hbar">
+<button type="button" class="pbtn" data-open-params>⚙ Параметры сети</button>
+<span class="pstate" data-pstate>Параметры стенда по умолчанию</span>
+</div>
+<div class="prog" aria-hidden="true"><span data-prog></span></div>
+</header>
+
+<h2 id="docs">Документация сети</h2>
+<p class="lead">Все ВМ: <code><span class="v" data-k="ISP_WAN">enp0s3</span></code> — NAT VirtualBox, <code><span class="v" data-k="MG_IF">enp0s8</span></code> — Host-Only (управление с хоста). <span class="hint">Значения с подчёркиванием берутся из <button type="button" class="linkbtn" data-open-params>параметров сети</button>.</span></p>
+
+<h4 id="topology">Топология</h4>
+<div class="card topo">
+<svg class="topo-wide" viewBox="0 0 960 520" role="img" aria-label="Схема сети: ISP соединён с HQ-RTR и BR-RTR, между маршрутизаторами GRE-туннель, за HQ-RTR — HQ-SRV и HQ-CLI, за BR-RTR — BR-SRV" font-family="-apple-system,Segoe UI,Roboto,Arial,sans-serif">
+<rect x="390" y="14" width="180" height="34" rx="17" class="pill-s"/>
+<text x="480" y="36" text-anchor="middle" class="sm">Интернет · NAT VirtualBox</text>
+<line x1="480" y1="48" x2="480" y2="104" class="ln"/>
+<text x="488" y="82" class="mn"><tspan class="v" data-k="ISP_WAN">enp0s3</tspan> · DHCP</text>
+<rect x="400" y="104" width="160" height="54" rx="8" class="bx b-isp"/>
+<text x="480" y="128" text-anchor="middle" class="nm">ISP</text>
+<text x="480" y="146" text-anchor="middle" class="mn">mgmt <tspan class="v" data-k="MG_ISP_DOT">.40</tspan></text>
+<line x1="400" y1="140" x2="210" y2="262" class="ln"/>
+<line x1="560" y1="140" x2="750" y2="262" class="ln"/>
+<text x="262" y="170" class="mn" text-anchor="middle"><tspan class="v" data-k="ISP_HQ_SUBNET">172.16.1.0/28</tspan></text>
+<text x="262" y="186" class="sm" text-anchor="middle">lab-isp-hq</text>
+<text x="698" y="170" class="mn" text-anchor="middle"><tspan class="v" data-k="ISP_BR_SUBNET">172.16.2.0/28</tspan></text>
+<text x="698" y="186" class="sm" text-anchor="middle">lab-isp-br</text>
+<text x="392" y="126" class="mn" text-anchor="end"><tspan class="v" data-k="ISP_HQ_DOT">.1</tspan> <tspan class="v" data-k="ISP_HQ_IF">enp0s9</tspan></text>
+<text x="568" y="126" class="mn"><tspan class="v" data-k="ISP_BR_DOT">.1</tspan> <tspan class="v" data-k="ISP_BR_IF">enp0s10</tspan></text>
+<text x="200" y="254" class="mn" text-anchor="end"><tspan class="v" data-k="HQ_WAN_IP_DOT">.2</tspan> <tspan class="v" data-k="HQ_WAN_IF">enp0s10</tspan></text>
+<text x="760" y="254" class="mn"><tspan class="v" data-k="BR_WAN_IP_DOT">.2</tspan> <tspan class="v" data-k="BR_WAN_IF">enp0s9</tspan></text>
+<rect x="110" y="262" width="200" height="56" rx="8" class="bx b-hq"/>
+<text x="210" y="286" text-anchor="middle" class="nm">HQ-RTR</text>
+<text x="210" y="304" text-anchor="middle" class="mn">mgmt <tspan class="v" data-k="MG_HQRTR_DOT">.10</tspan> · rid <tspan class="v" data-k="GRE_HQ_IP">10.10.10.1</tspan></text>
+<rect x="650" y="262" width="200" height="56" rx="8" class="bx b-br"/>
+<text x="750" y="286" text-anchor="middle" class="nm">BR-RTR</text>
+<text x="750" y="304" text-anchor="middle" class="mn">mgmt <tspan class="v" data-k="MG_BRRTR_DOT">.50</tspan> · rid <tspan class="v" data-k="GRE_BR">10.10.10.2</tspan></text>
+<line x1="310" y1="290" x2="650" y2="290" class="gre"/>
+<rect x="372" y="276" width="216" height="28" rx="6" class="gbg"/>
+<text x="480" y="295" text-anchor="middle" class="mn gt">GRE gre1 · <tspan class="v" data-k="GRE_HQ_SUBNET">10.10.10.0/30</tspan></text>
+<text x="480" y="324" text-anchor="middle" class="sm">OSPF area 0 · MD5</text>
+<text x="318" y="282" class="mn"><tspan class="v" data-k="GRE_HQ_DOT">.1</tspan></text>
+<text x="642" y="282" class="mn" text-anchor="end"><tspan class="v" data-k="GRE_BR_DOT">.2</tspan></text>
+<line x1="210" y1="318" x2="210" y2="384" class="ln"/>
+<text x="220" y="346" class="mn"><tspan class="v" data-k="HQ_LAN_IF">enp0s9</tspan> · trunk</text>
+<text x="220" y="362" class="sm">lab-core</text>
+<line x1="70" y1="384" x2="350" y2="384" class="bus"/>
+<line x1="120" y1="384" x2="120" y2="428" class="ln"/>
+<line x1="300" y1="384" x2="300" y2="428" class="ln"/>
+<rect x="40" y="428" width="160" height="70" rx="8" class="bx b-hq"/>
+<text x="120" y="452" text-anchor="middle" class="nm">HQ-SRV</text>
+<text x="120" y="470" text-anchor="middle" class="mn">VLAN <tspan class="v" data-k="V_SRV">100</tspan> · <tspan class="v" data-k="HQ_SRV_IP_DOT">.20</tspan></text>
+<text x="120" y="487" text-anchor="middle" class="sm">DNS · SSH <tspan class="v" data-k="SSH_PORT">2027</tspan></text>
+<rect x="220" y="428" width="160" height="70" rx="8" class="bx b-hq"/>
+<text x="300" y="452" text-anchor="middle" class="nm">HQ-CLI</text>
+<text x="300" y="470" text-anchor="middle" class="mn">VLAN <tspan class="v" data-k="V_CLI">200</tspan> · <tspan class="v" data-k="HQ_CLI_IP_DOT">.30</tspan></text>
+<text x="300" y="487" text-anchor="middle" class="sm">DHCP-клиент</text>
+<line x1="750" y1="318" x2="750" y2="428" class="ln"/>
+<text x="760" y="346" class="mn"><tspan class="v" data-k="BR_LAN_IF">enp0s10</tspan> · trunk</text>
+<text x="760" y="362" class="sm">lab-core-br</text>
+<rect x="670" y="428" width="160" height="70" rx="8" class="bx b-br"/>
+<text x="750" y="452" text-anchor="middle" class="nm">BR-SRV</text>
+<text x="750" y="470" text-anchor="middle" class="mn">VLAN <tspan class="v" data-k="V_SRV">100</tspan> · <tspan class="v" data-k="BR_SRV_IP_DOT">.10</tspan></text>
+<text x="750" y="487" text-anchor="middle" class="sm">SSH <tspan class="v" data-k="SSH_PORT">2027</tspan></text>
+<text x="408" y="424" class="mn">HQ: <tspan class="v" data-k="HQ_GW_SRV_SUBNET">10.0.100.0/24</tspan> · <tspan class="v" data-k="HQ_GW_CLI_SUBNET">10.0.200.0/24</tspan></text>
+<text x="408" y="442" class="mn">VLAN <tspan class="v" data-k="V_MGMT">999</tspan>: <tspan class="v" data-k="HQ_GW_MGMT_SUBNET">10.0.99.0/24</tspan></text>
+<text x="408" y="468" class="mn">BR: <tspan class="v" data-k="BR_GW_SRV_SUBNET">10.1.100.0/28</tspan> · <tspan class="v" data-k="BR_GW_MGMT_SUBNET">10.1.99.0/28</tspan></text>
+</svg>
+<svg class="topo-narrow" viewBox="0 0 360 600" role="img" aria-label="Схема сети (вертикальная)" font-family="-apple-system,Segoe UI,Roboto,Arial,sans-serif">
+<rect x="105" y="8" width="150" height="30" rx="15" class="pill-s"/>
+<text x="180" y="28" text-anchor="middle" class="sm">Интернет · NAT</text>
+<line x1="180" y1="38" x2="180" y2="78" class="ln"/>
+<text x="188" y="62" class="mn"><tspan class="v" data-k="ISP_WAN">enp0s3</tspan> · DHCP</text>
+<rect x="110" y="78" width="140" height="48" rx="8" class="bx b-isp"/>
+<text x="180" y="100" text-anchor="middle" class="nm">ISP</text>
+<text x="180" y="117" text-anchor="middle" class="mn">mgmt <tspan class="v" data-k="MG_ISP_DOT">.40</tspan></text>
+<line x1="130" y1="126" x2="90" y2="220" class="ln"/>
+<line x1="230" y1="126" x2="270" y2="220" class="ln"/>
+<text x="104" y="142" class="mn" text-anchor="end"><tspan class="v" data-k="ISP_HQ_DOT">.1</tspan> <tspan class="v" data-k="ISP_HQ_IF">enp0s9</tspan></text>
+<text x="256" y="142" class="mn"><tspan class="v" data-k="ISP_BR_DOT">.1</tspan> <tspan class="v" data-k="ISP_BR_IF">enp0s10</tspan></text>
+<text x="8" y="168" class="mn"><tspan class="v" data-k="ISP_HQ_SUBNET">172.16.1.0/28</tspan></text>
+<text x="8" y="183" class="sm">lab-isp-hq</text>
+<text x="352" y="168" class="mn" text-anchor="end"><tspan class="v" data-k="ISP_BR_SUBNET">172.16.2.0/28</tspan></text>
+<text x="352" y="183" class="sm" text-anchor="end">lab-isp-br</text>
+<text x="10" y="212" class="mn"><tspan class="v" data-k="HQ_WAN_IP_DOT">.2</tspan> <tspan class="v" data-k="HQ_WAN_IF">enp0s10</tspan></text>
+<text x="350" y="212" class="mn" text-anchor="end"><tspan class="v" data-k="BR_WAN_IP_DOT">.2</tspan> <tspan class="v" data-k="BR_WAN_IF">enp0s9</tspan></text>
+<rect x="10" y="220" width="160" height="50" rx="8" class="bx b-hq"/>
+<text x="90" y="242" text-anchor="middle" class="nm">HQ-RTR</text>
+<text x="90" y="259" text-anchor="middle" class="mn">rid <tspan class="v" data-k="GRE_HQ_IP">10.10.10.1</tspan></text>
+<rect x="190" y="220" width="160" height="50" rx="8" class="bx b-br"/>
+<text x="270" y="242" text-anchor="middle" class="nm">BR-RTR</text>
+<text x="270" y="259" text-anchor="middle" class="mn">rid <tspan class="v" data-k="GRE_BR">10.10.10.2</tspan></text>
+<line x1="170" y1="245" x2="190" y2="245" class="gre"/>
+<text x="180" y="292" text-anchor="middle" class="mn gt">GRE · <tspan class="v" data-k="GRE_HQ_SUBNET">10.10.10.0/30</tspan></text>
+<text x="180" y="307" text-anchor="middle" class="sm">OSPF area 0 · MD5</text>
+<line x1="90" y1="270" x2="90" y2="370" class="ln"/>
+<polyline points="90,356 4,356 4,481 10,481" class="ln"/>
+<text x="98" y="334" class="mn"><tspan class="v" data-k="HQ_LAN_IF">enp0s9</tspan> · trunk</text>
+<line x1="270" y1="270" x2="270" y2="370" class="ln"/>
+<text x="262" y="352" class="mn" text-anchor="end"><tspan class="v" data-k="BR_LAN_IF">enp0s10</tspan> · trunk</text>
+<rect x="10" y="370" width="160" height="62" rx="8" class="bx b-hq"/>
+<text x="90" y="392" text-anchor="middle" class="nm">HQ-SRV</text>
+<text x="90" y="409" text-anchor="middle" class="mn">VLAN <tspan class="v" data-k="V_SRV">100</tspan> · <tspan class="v" data-k="HQ_SRV_IP_DOT">.20</tspan></text>
+<text x="90" y="424" text-anchor="middle" class="sm">DNS · SSH <tspan class="v" data-k="SSH_PORT">2027</tspan></text>
+<rect x="10" y="450" width="160" height="62" rx="8" class="bx b-hq"/>
+<text x="90" y="472" text-anchor="middle" class="nm">HQ-CLI</text>
+<text x="90" y="489" text-anchor="middle" class="mn">VLAN <tspan class="v" data-k="V_CLI">200</tspan> · <tspan class="v" data-k="HQ_CLI_IP_DOT">.30</tspan></text>
+<text x="90" y="504" text-anchor="middle" class="sm">DHCP-клиент</text>
+<rect x="190" y="370" width="160" height="62" rx="8" class="bx b-br"/>
+<text x="270" y="392" text-anchor="middle" class="nm">BR-SRV</text>
+<text x="270" y="409" text-anchor="middle" class="mn">VLAN <tspan class="v" data-k="V_SRV">100</tspan> · <tspan class="v" data-k="BR_SRV_IP_DOT">.10</tspan></text>
+<text x="270" y="424" text-anchor="middle" class="sm">SSH <tspan class="v" data-k="SSH_PORT">2027</tspan></text>
+<text x="10" y="548" class="mn">HQ: <tspan class="v" data-k="HQ_GW_SRV_SUBNET">10.0.100.0/24</tspan> · <tspan class="v" data-k="HQ_GW_CLI_SUBNET">10.0.200.0/24</tspan></text>
+<text x="10" y="566" class="mn">VLAN <tspan class="v" data-k="V_MGMT">999</tspan>: <tspan class="v" data-k="HQ_GW_MGMT_SUBNET">10.0.99.0/24</tspan></text>
+<text x="10" y="590" class="mn">BR: <tspan class="v" data-k="BR_GW_SRV_SUBNET">10.1.100.0/28</tspan> · <tspan class="v" data-k="BR_GW_MGMT_SUBNET">10.1.99.0/28</tspan></text>
+</svg>
+</div>
+
+<h4 id="vms">Виртуальные машины</h4>
+<div class="tw"><table>
+<tr><th>ВМ</th><th>FQDN</th><th>ОС</th><th>RAM</th><th>Роль</th></tr>
+<tr><td><span class="dev d-isp">ISP</span></td><td class="m"><span class="v" data-k="H_ISP">isp.au-team.irpo</span></td><td>ALT Server 11.1</td><td>1 ГБ</td><td>Провайдер, NAT в Интернет, NTP</td></tr>
+<tr><td><span class="dev d-hq">HQ-RTR</span></td><td class="m"><span class="v" data-k="H_HQRTR">hq-rtr.au-team.irpo</span></td><td>ALT Server 11.1</td><td>1 ГБ</td><td>VLAN-маршрутизация, GRE, OSPF, NAT, DHCP</td></tr>
+<tr><td><span class="dev d-hq">HQ-SRV</span></td><td class="m"><span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span></td><td>ALT Server 11.1</td><td>1 ГБ</td><td>DNS (BIND), SSH</td></tr>
+<tr><td><span class="dev d-hq">HQ-CLI</span></td><td class="m"><span class="v" data-k="H_HQCLI">hq-cli.au-team.irpo</span></td><td>ALT Workstation 11.2</td><td>2 ГБ</td><td>Клиент, DHCP</td></tr>
+<tr><td><span class="dev d-br">BR-RTR</span></td><td class="m"><span class="v" data-k="H_BRRTR">br-rtr.au-team.irpo</span></td><td>ALT Server 11.1</td><td>1 ГБ</td><td>Маршрутизатор BR, GRE, OSPF, NAT</td></tr>
+<tr><td><span class="dev d-br">BR-SRV</span></td><td class="m"><span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span></td><td>ALT Server 11.1</td><td>1 ГБ</td><td>SSH</td></tr>
+</table></div>
+
+<h4 id="addr">IP-адресация</h4>
+<div class="tw"><table>
+<tr><th>Устройство</th><th>Интерфейс</th><th>Адрес</th><th>Шлюз</th><th>Сеть VirtualBox / назначение</th></tr>
+<tr class="grp"><td colspan="5">ISP</td></tr>
+<tr><td><span class="dev d-isp">ISP</span></td><td class="m"><span class="v" data-k="ISP_WAN">enp0s3</span></td><td class="m">DHCP</td><td class="m">DHCP</td><td>NAT — выход в Интернет</td></tr>
+<tr><td></td><td class="m"><span class="v" data-k="ISP_HQ_IF">enp0s9</span></td><td class="m"><span class="v" data-k="ISP_HQ">172.16.1.1/28</span></td><td class="m">—</td><td><code>lab-isp-hq</code> → HQ-RTR</td></tr>
+<tr><td></td><td class="m"><span class="v" data-k="ISP_BR_IF">enp0s10</span></td><td class="m"><span class="v" data-k="ISP_BR">172.16.2.1/28</span></td><td class="m">—</td><td><code>lab-isp-br</code> → BR-RTR</td></tr>
+<tr class="grp"><td colspan="5">Офис HQ</td></tr>
+<tr><td><span class="dev d-hq">HQ-RTR</span></td><td class="m"><span class="v" data-k="HQ_WAN_IF">enp0s10</span></td><td class="m"><span class="v" data-k="HQ_WAN_CIDR">172.16.1.2/28</span></td><td class="m"><span class="v" data-k="ISP_HQ_IP">172.16.1.1</span></td><td><code>lab-isp-hq</code> → ISP</td></tr>
+<tr><td></td><td class="m"><span class="v" data-k="HQ_LAN_IF">enp0s9</span></td><td class="m">—</td><td class="m">—</td><td><code>lab-core</code>, trunk <span class="v" data-k="V_SRV">100</span>/<span class="v" data-k="V_CLI">200</span>/<span class="v" data-k="V_MGMT">999</span></td></tr>
+<tr><td></td><td class="m"><span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span></td><td class="m"><span class="v" data-k="HQ_GW_SRV">10.0.100.1/24</span></td><td class="m">—</td><td>VLAN <span class="v" data-k="V_SRV">100</span> — серверы</td></tr>
+<tr><td></td><td class="m"><span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span></td><td class="m"><span class="v" data-k="HQ_GW_CLI">10.0.200.1/24</span></td><td class="m">—</td><td>VLAN <span class="v" data-k="V_CLI">200</span> — клиенты</td></tr>
+<tr><td></td><td class="m"><span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_MGMT">999</span></td><td class="m"><span class="v" data-k="HQ_GW_MGMT">10.0.99.1/24</span></td><td class="m">—</td><td>VLAN <span class="v" data-k="V_MGMT">999</span> — управление</td></tr>
+<tr><td></td><td class="m">gre1</td><td class="m"><span class="v" data-k="GRE_HQ">10.10.10.1/30</span></td><td class="m">—</td><td>Туннель к BR-RTR</td></tr>
+<tr><td><span class="dev d-hq">HQ-SRV</span></td><td class="m"><span class="v" data-k="HQ_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span></td><td class="m"><span class="v" data-k="HQ_SRV_CIDR">10.0.100.20/24</span></td><td class="m"><span class="v" data-k="HQ_GW_SRV_IP">10.0.100.1</span></td><td><code>lab-core</code>, VLAN <span class="v" data-k="V_SRV">100</span></td></tr>
+<tr><td><span class="dev d-hq">HQ-CLI</span></td><td class="m"><span class="v" data-k="HQ_CLI_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span></td><td class="m"><span class="v" data-k="HQ_CLI_CIDR">10.0.200.30/24</span></td><td class="m"><span class="v" data-k="HQ_GW_CLI_IP">10.0.200.1</span></td><td><code>lab-core</code>, VLAN <span class="v" data-k="V_CLI">200</span> · DHCP-резерв</td></tr>
+<tr class="grp"><td colspan="5">Офис BR</td></tr>
+<tr><td><span class="dev d-br">BR-RTR</span></td><td class="m"><span class="v" data-k="BR_WAN_IF">enp0s9</span></td><td class="m"><span class="v" data-k="BR_WAN_CIDR">172.16.2.2/28</span></td><td class="m"><span class="v" data-k="ISP_BR_IP">172.16.2.1</span></td><td><code>lab-isp-br</code> → ISP</td></tr>
+<tr><td></td><td class="m"><span class="v" data-k="BR_LAN_IF">enp0s10</span></td><td class="m">—</td><td class="m">—</td><td><code>lab-core-br</code>, trunk <span class="v" data-k="V_SRV">100</span>/<span class="v" data-k="V_MGMT">999</span></td></tr>
+<tr><td></td><td class="m"><span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_SRV">100</span></td><td class="m"><span class="v" data-k="BR_GW_SRV">10.1.100.1/28</span></td><td class="m">—</td><td>VLAN <span class="v" data-k="V_SRV">100</span> — серверы</td></tr>
+<tr><td></td><td class="m"><span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_MGMT">999</span></td><td class="m"><span class="v" data-k="BR_GW_MGMT">10.1.99.1/28</span></td><td class="m">—</td><td>VLAN <span class="v" data-k="V_MGMT">999</span> — управление</td></tr>
+<tr><td></td><td class="m">gre1</td><td class="m"><span class="v" data-k="GRE_BR_CIDR">10.10.10.2/30</span></td><td class="m">—</td><td>Туннель к HQ-RTR</td></tr>
+<tr><td><span class="dev d-br">BR-SRV</span></td><td class="m"><span class="v" data-k="BR_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span></td><td class="m"><span class="v" data-k="BR_SRV_CIDR">10.1.100.10/28</span></td><td class="m"><span class="v" data-k="BR_GW_SRV_IP">10.1.100.1</span></td><td><code>lab-core-br</code>, VLAN <span class="v" data-k="V_SRV">100</span></td></tr>
+<tr class="grp"><td colspan="5">Управление (<span class="v" data-k="MG_IF">enp0s8</span>, Host-Only)</td></tr>
+<tr><td colspan="5" class="m wrap">HQ-RTR <span class="v" data-k="MG_HQRTR_CIDR">192.168.56.10/24</span> · HQ-SRV <span class="v" data-k="MG_HQSRV_CIDR">192.168.56.20/24</span> · HQ-CLI <span class="v" data-k="MG_HQCLI_CIDR">192.168.56.30/24</span> · ISP <span class="v" data-k="MG_ISP_CIDR">192.168.56.40/24</span> · BR-RTR <span class="v" data-k="MG_BRRTR_CIDR">192.168.56.50/24</span> · BR-SRV <span class="v" data-k="MG_BRSRV_CIDR">192.168.56.60/24</span></td></tr>
+</table></div>
+
+<h4 id="vlan">VLAN и подсети</h4>
+<div class="tw"><table>
+<tr><th>VLAN</th><th>Назначение</th><th>HQ</th><th>BR</th></tr>
+<tr><td class="m"><span class="v" data-k="V_SRV">100</span></td><td>Серверы</td><td class="m"><span class="v" data-k="HQ_GW_SRV_SUBNET">10.0.100.0/24</span></td><td class="m"><span class="v" data-k="BR_GW_SRV_SUBNET">10.1.100.0/28</span></td></tr>
+<tr><td class="m"><span class="v" data-k="V_CLI">200</span></td><td>Клиенты</td><td class="m"><span class="v" data-k="HQ_GW_CLI_SUBNET">10.0.200.0/24</span></td><td class="m">—</td></tr>
+<tr><td class="m"><span class="v" data-k="V_MGMT">999</span></td><td>Управление</td><td class="m"><span class="v" data-k="HQ_GW_MGMT_SUBNET">10.0.99.0/24</span></td><td class="m"><span class="v" data-k="BR_GW_MGMT_SUBNET">10.1.99.0/28</span></td></tr>
+<tr><td class="m">—</td><td>GRE-туннель</td><td class="m" colspan="2"><span class="v" data-k="GRE_HQ_SUBNET">10.10.10.0/30</span> (HQ <span class="v" data-k="GRE_HQ_DOT">.1</span> · BR <span class="v" data-k="GRE_BR_DOT">.2</span>)</td></tr>
+</table></div>
+<div class="note" id="kimcheck-wrap"><b>Соответствие размерам сетей из КИМ</b> <span class="hint">— пересчитывается при смене параметров</span>
+<ul class="kim" id="kimcheck"></ul>
+<p class="kim-foot">BR-FW на стенде отсутствует: сеть BR-FW ↔ BR-RTR и OSPF на нём не настраиваются, в DNS остаётся только запись <code>br-fw</code>.</p></div>
+
+<h4 id="services">Службы и учётные записи</h4>
+<div class="tw"><table class="svc">
+<tr><th>Служба</th><th>Где</th><th>Параметры</th></tr>
+<tr><td>Учётка <code>sshuser</code></td><td>HQ-SRV, BR-SRV</td><td>UID <span class="v" data-k="SSH_UID">2027</span>, пароль <code><span class="v" data-k="PW">P@ssw0rd</span></code>, sudo без пароля</td></tr>
+<tr><td>Учётка <code>net_admin</code></td><td>HQ-RTR, BR-RTR</td><td>Пароль <code><span class="v" data-k="PW">P@ssw0rd</span></code>, sudo без пароля</td></tr>
+<tr><td>SSH</td><td>HQ-SRV, BR-SRV</td><td>Порт <span class="v" data-k="SSH_PORT">2027</span>, <code>AllowUsers sshuser</code>, <code>MaxAuthTries 2</code>, баннер «<span class="v" data-k="BANNER">Authorized access only</span>»</td></tr>
+<tr><td>GRE</td><td>HQ-RTR ↔ BR-RTR</td><td><span class="v" data-k="HQ_WAN_IP">172.16.1.2</span> ↔ <span class="v" data-k="BR_WAN_IP">172.16.2.2</span>, TTL 255, <span class="v" data-k="GRE_HQ_SUBNET">10.10.10.0/30</span></td></tr>
+<tr><td>OSPF (FRR)</td><td>HQ-RTR, BR-RTR</td><td>Area 0, router-id <span class="v" data-k="GRE_HQ_IP">10.10.10.1</span> / <span class="v" data-k="GRE_BR">10.10.10.2</span>, активен только gre1, MD5-ключ 1 <code><span class="v" data-k="PW">P@ssw0rd</span></code></td></tr>
+<tr><td>NAT (nftables)</td><td>ISP, HQ-RTR, BR-RTR</td><td>Masquerade: ISP → <span class="v" data-k="ISP_WAN">enp0s3</span>, HQ-RTR → <span class="v" data-k="HQ_WAN_IF">enp0s10</span>, BR-RTR → <span class="v" data-k="BR_WAN_IF">enp0s9</span></td></tr>
+<tr><td>DHCP (ISC)</td><td>HQ-RTR</td><td><span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>, пул <span class="v" data-k="DHCP_FROM">10.0.200.50</span>–<span class="v" data-k="DHCP_TO">10.0.200.150</span>, шлюз <span class="v" data-k="HQ_GW_CLI_IP">10.0.200.1</span>, DNS <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>, суффикс <span class="v" data-k="DOMAIN">au-team.irpo</span>, резерв HQ-CLI <span class="v" data-k="HQ_CLI_IP">10.0.200.30</span></td></tr>
+<tr><td>DNS (BIND)</td><td>HQ-SRV</td><td>Зона <span class="v" data-k="DOMAIN">au-team.irpo</span> + <span class="v" data-k="REV_HQ">100.0.10.in-addr.arpa</span> / <span class="v" data-k="REV_BR">100.1.10.in-addr.arpa</span>, пересылка <span class="v" data-k="DNS_FWD">77.88.8.7</span></td></tr>
+<tr><td>Часовой пояс</td><td>Все</td><td><span class="v" data-k="TZ">Europe/Moscow</span></td></tr>
+</table></div>
+
+<h4 id="dns">DNS-записи (таблица 3 КИМ)</h4>
+<div class="tw"><table>
+<tr><th>Имя</th><th>Тип</th><th>Адрес</th><th>Устройство</th></tr>
+<tr><td class="m"><span class="v" data-k="H_HQRTR">hq-rtr.au-team.irpo</span></td><td>A</td><td class="m"><span class="v" data-k="HQ_GW_MGMT_IP">10.0.99.1</span></td><td>HQ-RTR</td></tr>
+<tr><td class="m"><span class="v" data-k="H_BRRTR">br-rtr.au-team.irpo</span></td><td>A</td><td class="m"><span class="v" data-k="BR_GW_MGMT_IP">10.1.99.1</span></td><td>BR-RTR</td></tr>
+<tr><td class="m">br-fw.<span class="v" data-k="DOMAIN">au-team.irpo</span></td><td>A</td><td class="m"><span class="v" data-k="BR_FW_IP">10.1.99.2</span></td><td>BR-FW (нет на стенде)</td></tr>
+<tr><td class="m"><span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span></td><td>A, PTR</td><td class="m"><span class="v" data-k="HQ_SRV_IP">10.0.100.20</span></td><td>HQ-SRV</td></tr>
+<tr><td class="m"><span class="v" data-k="H_HQCLI">hq-cli.au-team.irpo</span></td><td>A</td><td class="m"><span class="v" data-k="HQ_CLI_IP">10.0.200.30</span></td><td>HQ-CLI</td></tr>
+<tr><td class="m"><span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span></td><td>A, PTR</td><td class="m"><span class="v" data-k="BR_SRV_IP">10.1.100.10</span></td><td>BR-SRV</td></tr>
+<tr><td class="m">docker.<span class="v" data-k="DOMAIN">au-team.irpo</span></td><td>A</td><td class="m"><span class="v" data-k="ISP_HQ_IP">172.16.1.1</span></td><td>ISP (к HQ-RTR)</td></tr>
+<tr><td class="m">web.<span class="v" data-k="DOMAIN">au-team.irpo</span></td><td>A</td><td class="m"><span class="v" data-k="ISP_BR_IP">172.16.2.1</span></td><td>ISP (к BR-RTR)</td></tr>
+</table></div>
+
+
+<h2 id="cmds">Команды настройки</h2>
+<p class="lead">Каждый блок копируется целиком и вставляется в терминал под root. Отмечайте выполненные блоки галочкой — отметки сохраняются в браузере.</p>
+<div class="filter" role="search">
+<div class="frow" role="group" aria-label="Фильтр по устройству">
+<button type="button" data-f="" aria-pressed="true">Все</button><button type="button" data-f="ISP" aria-pressed="false">ISP</button><button type="button" data-f="HQ-RTR" aria-pressed="false">HQ-RTR</button><button type="button" data-f="HQ-SRV" aria-pressed="false">HQ-SRV</button><button type="button" data-f="HQ-CLI" aria-pressed="false">HQ-CLI</button><button type="button" data-f="BR-RTR" aria-pressed="false">BR-RTR</button><button type="button" data-f="BR-SRV" aria-pressed="false">BR-SRV</button>
+</div>
+<div class="frow">
+<label class="search"><span class="sr">Поиск по командам</span><input type="search" placeholder="Поиск по командам…" data-search autocomplete="off"></label>
+<label class="tgl"><input type="checkbox" data-hl checked> Подсветка параметров</label>
+</div>
+<div class="devact" data-devact hidden>
+<span data-devact-txt></span>
+<button type="button" class="act" data-copy-all>Скопировать всё</button>
+<button type="button" class="act" data-download>Скачать .sh</button>
+</div>
+</div>
+<p class="empty" data-empty hidden>Ничего не найдено.</p>
+<section class="step" id="prep" data-num="0" data-title="Подготовка стенда">
+<div class="sh"><span class="snum">0</span><div><div class="exam">вне КИМ</div><h3>Подготовка стенда</h3></div></div>
+<p class="sd">Выполняется до заданий экзамена. Сеть управления вводится вручную в консоли VirtualBox, дальше подключайтесь с хоста по SSH (<code>ssh user@192.168.56.X</code>, затем <code>su -</code>) и вставляйте блоки целиком.</p>
+<div class="block" id="prep-1" data-dev="ISP" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Сеть управления enp0s8"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">Сеть управления <span class="v" data-k="MG_IF">enp0s8</span></span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\nCONFIG_IPV4=yes\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>/options
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="MG_ISP_CIDR">192.168.56.40/24</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>/ipv4address
+<span class="k">systemctl</span> restart network</code></pre></div><div class="block" id="prep-2" data-dev="HQ-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Сеть управления enp0s8"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">Сеть управления <span class="v" data-k="MG_IF">enp0s8</span></span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\nCONFIG_IPV4=yes\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>/options
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="MG_HQRTR_CIDR">192.168.56.10/24</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>/ipv4address
+<span class="k">systemctl</span> restart network</code></pre></div><div class="block" id="prep-3" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Сеть управления enp0s8"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Сеть управления <span class="v" data-k="MG_IF">enp0s8</span></span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\nCONFIG_IPV4=yes\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>/options
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="MG_HQSRV_CIDR">192.168.56.20/24</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>/ipv4address
+<span class="k">systemctl</span> restart network</code></pre></div><div class="block" id="prep-4" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Сеть управления enp0s8"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Сеть управления <span class="v" data-k="MG_IF">enp0s8</span></span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\nCONFIG_IPV4=yes\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>/options
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="MG_HQCLI_CIDR">192.168.56.30/24</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>/ipv4address
+<span class="k">systemctl</span> restart network</code></pre></div><div class="block" id="prep-5" data-dev="BR-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Сеть управления enp0s8"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-RTR</span><span class="btitle">Сеть управления <span class="v" data-k="MG_IF">enp0s8</span></span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\nCONFIG_IPV4=yes\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>/options
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="MG_BRRTR_CIDR">192.168.56.50/24</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>/ipv4address
+<span class="k">systemctl</span> restart network</code></pre></div><div class="block" id="prep-6" data-dev="BR-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Сеть управления enp0s8"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Сеть управления <span class="v" data-k="MG_IF">enp0s8</span></span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\nCONFIG_IPV4=yes\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>/options
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="MG_BRSRV_CIDR">192.168.56.60/24</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="MG_IF">enp0s8</span>/ipv4address
+<span class="k">systemctl</span> restart network</code></pre></div><div class="block" id="prep-7" data-dev="ISP" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пакеты (пока работает NAT VirtualBox)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">Пакеты (пока работает NAT VirtualBox)</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> update <span class="op">&amp;&amp;</span> <span class="k">apt-get</span> install <span class="o">-y</span> nftables</code></pre></div><div class="block" id="prep-8" data-dev="HQ-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пакеты"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">Пакеты</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> update <span class="op">&amp;&amp;</span> <span class="k">apt-get</span> install <span class="o">-y</span> frr nftables dhcp-server</code></pre></div><div class="block" id="prep-9" data-dev="BR-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пакеты"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-RTR</span><span class="btitle">Пакеты</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> update <span class="op">&amp;&amp;</span> <span class="k">apt-get</span> install <span class="o">-y</span> frr nftables</code></pre></div><div class="block" id="prep-10" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пакеты"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Пакеты</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> update <span class="op">&amp;&amp;</span> <span class="k">apt-get</span> install <span class="o">-y</span> bind bind-utils openssh-server</code></pre></div><div class="block" id="prep-11" data-dev="BR-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пакеты"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Пакеты</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> update <span class="op">&amp;&amp;</span> <span class="k">apt-get</span> install <span class="o">-y</span> openssh-server</code></pre></div><div class="block" id="prep-12" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пакеты"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Пакеты</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> update <span class="op">&amp;&amp;</span> <span class="k">apt-get</span> install <span class="o">-y</span> dhcpcd bind-utils</code></pre></div><div class="block" id="prep-13" data-dev="HQ-RTR|BR-RTR|HQ-SRV|BR-SRV|HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Отключить NAT-адаптер enp0s3 (все, кроме ISP)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="dev d-br">BR-RTR</span><span class="dev d-hq">HQ-SRV</span><span class="dev d-br">BR-SRV</span><span class="dev d-hq">HQ-CLI</span><span class="btitle">Отключить NAT-адаптер <span class="v" data-k="ISP_WAN">enp0s3</span> (все, кроме ISP)</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="c"># дальше интернет идёт только через ISP</span>
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="ISP_WAN">enp0s3</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nDISABLED=yes\nONBOOT=no\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="ISP_WAN">enp0s3</span>/options
+<span class="k">ip</span> addr flush dev <span class="v" data-k="ISP_WAN">enp0s3</span>
+<span class="k">ip</span> link set <span class="v" data-k="ISP_WAN">enp0s3</span> down
+<span class="k">systemctl</span> restart network
+<span class="k">ip</span> route</code></pre></div>
+</section>
+<section class="step" id="t1" data-num="1" data-title="Базовая настройка устройств">
+<div class="sh"><span class="snum">1</span><div><div class="exam">Задание 1</div><h3>Базовая настройка устройств</h3></div></div>
+<p class="sd">Имена (FQDN), адресация внешних интерфейсов и сегмента BR, IP-форвардинг на маршрутизаторах. Адреса сегмента HQ задаются в задании 4 (VLAN).</p>
+<div class="block" id="t1-1" data-dev="ISP" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Имя"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">Имя</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">hostnamectl</span> set-hostname <span class="v" data-k="H_ISP">isp.au-team.irpo</span>; <span class="k">exec</span> bash</code></pre></div><div class="block" id="t1-2" data-dev="HQ-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Имя, интерфейс к ISP, форвардинг"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">Имя, интерфейс к ISP, форвардинг</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">hostnamectl</span> set-hostname <span class="v" data-k="H_HQRTR">hq-rtr.au-team.irpo</span>
+
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="HQ_WAN_IF">enp0s10</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\nCONFIG_IPV4=yes\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_WAN_IF">enp0s10</span>/options
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="HQ_WAN_CIDR">172.16.1.2/28</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_WAN_IF">enp0s10</span>/ipv4address
+<span class="k">echo</span> <span class="s">&#x27;default via <span class="v" data-k="ISP_HQ_IP">172.16.1.1</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_WAN_IF">enp0s10</span>/ipv4route
+
+<span class="c"># IP-форвардинг</span>
+<span class="k">sed</span> <span class="o">-i</span> <span class="s">&#x27;s/^net.ipv4.ip_forward.*/net.ipv4.ip_forward = 1/&#x27;</span> /etc/net/sysctl.conf
+<span class="k">sysctl</span> <span class="o">-w</span> net.ipv4.ip_forward=1
+<span class="k">systemctl</span> restart network; <span class="k">exec</span> bash</code></pre></div><div class="block" id="t1-3" data-dev="BR-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Имя, интерфейс к ISP, VLAN в сторону BR-SRV, форвардинг"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-RTR</span><span class="btitle">Имя, интерфейс к ISP, VLAN в сторону BR-SRV, форвардинг</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">hostnamectl</span> set-hostname <span class="v" data-k="H_BRRTR">br-rtr.au-team.irpo</span>
+
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="BR_WAN_IF">enp0s9</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\nCONFIG_IPV4=yes\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_WAN_IF">enp0s9</span>/options
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="BR_WAN_CIDR">172.16.2.2/28</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_WAN_IF">enp0s9</span>/ipv4address
+<span class="k">echo</span> <span class="s">&#x27;default via <span class="v" data-k="ISP_BR_IP">172.16.2.1</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_WAN_IF">enp0s9</span>/ipv4route
+
+<span class="c"># trunk <span class="v" data-k="BR_LAN_IF">enp0s10</span> (lab-core-br): VLAN <span class="v" data-k="V_SRV">100</span> и <span class="v" data-k="V_MGMT">999</span></span>
+<span class="k">modprobe</span> 8021q
+<span class="k">grep</span> <span class="o">-qx</span> 8021q /etc/modules <span class="op">||</span> <span class="k">echo</span> 8021q <span class="op">&gt;&gt;</span> /etc/modules
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="BR_LAN_IF">enp0s10</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_LAN_IF">enp0s10</span>/options
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_SRV">100</span>
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_SRV">100</span>/options <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">TYPE</span>=<span class="s">vlan</span>
+<span class="p">HOST</span>=<span class="s"><span class="v" data-k="BR_LAN_IF">enp0s10</span></span>
+<span class="p">VID</span>=<span class="s"><span class="v" data-k="V_SRV">100</span></span>
+<span class="p">BOOTPROTO</span>=<span class="s">static</span>
+<span class="p">DISABLED</span>=<span class="s">no</span>
+<span class="p">CONFIG_IPV4</span>=<span class="s">yes</span>
+<span class="h">EOF</span>
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_MGMT">999</span>
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_MGMT">999</span>/options <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">TYPE</span>=<span class="s">vlan</span>
+<span class="p">HOST</span>=<span class="s"><span class="v" data-k="BR_LAN_IF">enp0s10</span></span>
+<span class="p">VID</span>=<span class="s"><span class="v" data-k="V_MGMT">999</span></span>
+<span class="p">BOOTPROTO</span>=<span class="s">static</span>
+<span class="p">DISABLED</span>=<span class="s">no</span>
+<span class="p">CONFIG_IPV4</span>=<span class="s">yes</span>
+<span class="h">EOF</span>
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="BR_GW_SRV">10.1.100.1/28</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_SRV">100</span>/ipv4address
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="BR_GW_MGMT">10.1.99.1/28</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_MGMT">999</span>/ipv4address
+
+<span class="c"># IP-форвардинг</span>
+<span class="k">sed</span> <span class="o">-i</span> <span class="s">&#x27;s/^net.ipv4.ip_forward.*/net.ipv4.ip_forward = 1/&#x27;</span> /etc/net/sysctl.conf
+<span class="k">sysctl</span> <span class="o">-w</span> net.ipv4.ip_forward=1
+<span class="k">systemctl</span> restart network; <span class="k">exec</span> bash
+<span class="k">ip</span> <span class="o">-br</span> a</code></pre></div><div class="block" id="t1-4" data-dev="BR-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Имя и адрес в VLAN 100"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Имя и адрес в VLAN <span class="v" data-k="V_SRV">100</span></span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">hostnamectl</span> set-hostname <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>
+
+<span class="k">modprobe</span> 8021q
+<span class="k">grep</span> <span class="o">-qx</span> 8021q /etc/modules <span class="op">||</span> <span class="k">echo</span> 8021q <span class="op">&gt;&gt;</span> /etc/modules
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="BR_SRV_IF">enp0s9</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_SRV_IF">enp0s9</span>/options
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="BR_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/options <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">TYPE</span>=<span class="s">vlan</span>
+<span class="p">HOST</span>=<span class="s"><span class="v" data-k="BR_SRV_IF">enp0s9</span></span>
+<span class="p">VID</span>=<span class="s"><span class="v" data-k="V_SRV">100</span></span>
+<span class="p">BOOTPROTO</span>=<span class="s">static</span>
+<span class="p">DISABLED</span>=<span class="s">no</span>
+<span class="p">CONFIG_IPV4</span>=<span class="s">yes</span>
+<span class="h">EOF</span>
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="BR_SRV_CIDR">10.1.100.10/28</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/ipv4address
+<span class="k">echo</span> <span class="s">&#x27;default via <span class="v" data-k="BR_GW_SRV_IP">10.1.100.1</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/ipv4route
+<span class="k">systemctl</span> restart network; <span class="k">exec</span> bash
+<span class="k">ip</span> <span class="o">-br</span> a</code></pre></div><div class="block" id="t1-5" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Имя"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Имя</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">hostnamectl</span> set-hostname <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>; <span class="k">exec</span> bash</code></pre></div><div class="block" id="t1-6" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Имя"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Имя</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">hostnamectl</span> set-hostname <span class="v" data-k="H_HQCLI">hq-cli.au-team.irpo</span>; <span class="k">exec</span> bash</code></pre></div>
+</section>
+<section class="step" id="t2" data-num="2" data-title="Доступ в Интернет на ISP">
+<div class="sh"><span class="snum">2</span><div><div class="exam">Задание 2</div><h3>Доступ в Интернет на ISP</h3></div></div>
+<p class="sd">Внешний интерфейс получает адрес по DHCP от NAT VirtualBox (маршрут по умолчанию и DNS приходят оттуда же). Для HQ-RTR и BR-RTR — динамическая трансляция (masquerade).</p>
+<div class="block" id="t2-1" data-dev="ISP" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Интерфейсы и форвардинг"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">Интерфейсы и форвардинг</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="ISP_WAN">enp0s3</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=dhcp\nDISABLED=no\nCONFIG_IPV4=yes\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="ISP_WAN">enp0s3</span>/options
+
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="ISP_HQ_IF">enp0s9</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\nCONFIG_IPV4=yes\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="ISP_HQ_IF">enp0s9</span>/options
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="ISP_HQ">172.16.1.1/28</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="ISP_HQ_IF">enp0s9</span>/ipv4address
+
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="ISP_BR_IF">enp0s10</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\nCONFIG_IPV4=yes\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="ISP_BR_IF">enp0s10</span>/options
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="ISP_BR">172.16.2.1/28</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="ISP_BR_IF">enp0s10</span>/ipv4address
+
+<span class="c"># IP-форвардинг</span>
+<span class="k">sed</span> <span class="o">-i</span> <span class="s">&#x27;s/^net.ipv4.ip_forward.*/net.ipv4.ip_forward = 1/&#x27;</span> /etc/net/sysctl.conf
+<span class="k">sysctl</span> <span class="o">-w</span> net.ipv4.ip_forward=1
+<span class="k">systemctl</span> restart network
+<span class="k">ip</span> <span class="o">-br</span> a</code></pre></div><div class="block" id="t2-2" data-dev="ISP" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: NAT в сторону Интернета"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">NAT в сторону Интернета</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">cat</span> <span class="op">&gt;</span> /etc/nftables/nftables.nft <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="c">#!/usr/sbin/nft -f</span>
+<span class="p">flush</span> ruleset
+
+<span class="p">table</span> ip nat {
+    <span class="p">chain</span> postrouting {
+        <span class="p">type</span> nat hook postrouting priority srcnat; policy accept;
+        <span class="p">oifname</span> &quot;<span class="v" data-k="ISP_WAN">enp0s3</span>&quot; masquerade
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="h">EOF</span>
+<span class="k">systemctl</span> enable <span class="o">--now</span> nftables
+<span class="k">systemctl</span> restart nftables
+<span class="k">nft</span> list ruleset</code></pre></div>
+</section>
+<section class="step" id="t3" data-num="3" data-title="Локальные учётные записи">
+<div class="sh"><span class="snum">3</span><div><div class="exam">Задание 3</div><h3>Локальные учётные записи</h3></div></div>
+<p class="sd">sshuser на серверах, net_admin на маршрутизаторах, sudo без пароля.</p>
+<div class="block" id="t3-1" data-dev="HQ-SRV|BR-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пользователь sshuser"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-br">BR-SRV</span><span class="btitle">Пользователь sshuser</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">useradd</span> <span class="o">-m</span> <span class="o">-u</span> <span class="v" data-k="SSH_UID">2027</span> sshuser
+<span class="k">echo</span> <span class="s">&#x27;sshuser:<span class="v" data-k="PW">P@ssw0rd</span>&#x27;</span> <span class="op">|</span> <span class="k">chpasswd</span>
+<span class="k">usermod</span> <span class="o">-aG</span> wheel sshuser
+<span class="k">echo</span> <span class="s">&#x27;sshuser ALL=(ALL:ALL) NOPASSWD: ALL&#x27;</span> <span class="op">&gt;&gt;</span> /etc/sudoers
+<span class="k">visudo</span> <span class="o">-c</span>
+<span class="k">id</span> sshuser</code></pre></div><div class="block" id="t3-2" data-dev="HQ-RTR|BR-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пользователь net_admin"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="dev d-br">BR-RTR</span><span class="btitle">Пользователь net_admin</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">useradd</span> <span class="o">-m</span> net_admin
+<span class="k">echo</span> <span class="s">&#x27;net_admin:<span class="v" data-k="PW">P@ssw0rd</span>&#x27;</span> <span class="op">|</span> <span class="k">chpasswd</span>
+<span class="k">usermod</span> <span class="o">-aG</span> wheel net_admin
+<span class="k">echo</span> <span class="s">&#x27;net_admin ALL=(ALL:ALL) NOPASSWD: ALL&#x27;</span> <span class="op">&gt;&gt;</span> /etc/sudoers
+<span class="k">visudo</span> <span class="o">-c</span>
+<span class="k">id</span> net_admin</code></pre></div>
+</section>
+<section class="step" id="t4" data-num="4" data-title="Коммутация в сегменте HQ (VLAN)">
+<div class="sh"><span class="snum">4</span><div><div class="exam">Задание 4</div><h3>Коммутация в сегменте HQ (VLAN)</h3></div></div>
+<p class="sd">Router-on-a-stick: все VLAN маршрутизируются через один адаптер HQ-RTR (внутренняя сеть lab-core). HQ-SRV и HQ-CLI тегируют трафик сами.</p>
+<div class="block" id="t4-1" data-dev="HQ-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Trunk + VLAN 100 / 200 / 999"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">Trunk + VLAN <span class="v" data-k="V_SRV">100</span> / <span class="v" data-k="V_CLI">200</span> / <span class="v" data-k="V_MGMT">999</span></span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">modprobe</span> 8021q
+<span class="k">grep</span> <span class="o">-qx</span> 8021q /etc/modules <span class="op">||</span> <span class="k">echo</span> 8021q <span class="op">&gt;&gt;</span> /etc/modules
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>/options
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/options <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">TYPE</span>=<span class="s">vlan</span>
+<span class="p">HOST</span>=<span class="s"><span class="v" data-k="HQ_LAN_IF">enp0s9</span></span>
+<span class="p">VID</span>=<span class="s"><span class="v" data-k="V_SRV">100</span></span>
+<span class="p">BOOTPROTO</span>=<span class="s">static</span>
+<span class="p">DISABLED</span>=<span class="s">no</span>
+<span class="p">CONFIG_IPV4</span>=<span class="s">yes</span>
+<span class="h">EOF</span>
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>/options <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">TYPE</span>=<span class="s">vlan</span>
+<span class="p">HOST</span>=<span class="s"><span class="v" data-k="HQ_LAN_IF">enp0s9</span></span>
+<span class="p">VID</span>=<span class="s"><span class="v" data-k="V_CLI">200</span></span>
+<span class="p">BOOTPROTO</span>=<span class="s">static</span>
+<span class="p">DISABLED</span>=<span class="s">no</span>
+<span class="p">CONFIG_IPV4</span>=<span class="s">yes</span>
+<span class="h">EOF</span>
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_MGMT">999</span>
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_MGMT">999</span>/options <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">TYPE</span>=<span class="s">vlan</span>
+<span class="p">HOST</span>=<span class="s"><span class="v" data-k="HQ_LAN_IF">enp0s9</span></span>
+<span class="p">VID</span>=<span class="s"><span class="v" data-k="V_MGMT">999</span></span>
+<span class="p">BOOTPROTO</span>=<span class="s">static</span>
+<span class="p">DISABLED</span>=<span class="s">no</span>
+<span class="p">CONFIG_IPV4</span>=<span class="s">yes</span>
+<span class="h">EOF</span>
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="HQ_GW_SRV">10.0.100.1/24</span>&#x27;</span>  <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/ipv4address
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="HQ_GW_CLI">10.0.200.1/24</span>&#x27;</span>  <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>/ipv4address
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="HQ_GW_MGMT">10.0.99.1/24</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_MGMT">999</span>/ipv4address
+<span class="k">systemctl</span> restart network
+<span class="k">ip</span> <span class="o">-br</span> a</code></pre></div><div class="block" id="t4-2" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: VLAN 100"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">VLAN <span class="v" data-k="V_SRV">100</span></span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">modprobe</span> 8021q
+<span class="k">grep</span> <span class="o">-qx</span> 8021q /etc/modules <span class="op">||</span> <span class="k">echo</span> 8021q <span class="op">&gt;&gt;</span> /etc/modules
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="HQ_SRV_IF">enp0s9</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_SRV_IF">enp0s9</span>/options
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="HQ_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/options <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">TYPE</span>=<span class="s">vlan</span>
+<span class="p">HOST</span>=<span class="s"><span class="v" data-k="HQ_SRV_IF">enp0s9</span></span>
+<span class="p">VID</span>=<span class="s"><span class="v" data-k="V_SRV">100</span></span>
+<span class="p">BOOTPROTO</span>=<span class="s">static</span>
+<span class="p">DISABLED</span>=<span class="s">no</span>
+<span class="p">CONFIG_IPV4</span>=<span class="s">yes</span>
+<span class="h">EOF</span>
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="HQ_SRV_CIDR">10.0.100.20/24</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/ipv4address
+<span class="k">echo</span> <span class="s">&#x27;default via <span class="v" data-k="HQ_GW_SRV_IP">10.0.100.1</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/ipv4route
+<span class="k">systemctl</span> restart network
+<span class="k">ping</span> <span class="o">-c3</span> <span class="v" data-k="HQ_GW_SRV_IP">10.0.100.1</span></code></pre></div><div class="block" id="t4-3" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: VLAN 200 (статикой, до задания 9)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">VLAN <span class="v" data-k="V_CLI">200</span> (статикой, до задания 9)</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">modprobe</span> 8021q
+<span class="k">grep</span> <span class="o">-qx</span> 8021q /etc/modules <span class="op">||</span> <span class="k">echo</span> 8021q <span class="op">&gt;&gt;</span> /etc/modules
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="HQ_CLI_IF">enp0s9</span>
+<span class="k">printf</span> <span class="s">&#x27;TYPE=eth\nBOOTPROTO=static\nDISABLED=no\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_CLI_IF">enp0s9</span>/options
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="HQ_CLI_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_CLI_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>/options <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">TYPE</span>=<span class="s">vlan</span>
+<span class="p">HOST</span>=<span class="s"><span class="v" data-k="HQ_CLI_IF">enp0s9</span></span>
+<span class="p">VID</span>=<span class="s"><span class="v" data-k="V_CLI">200</span></span>
+<span class="p">BOOTPROTO</span>=<span class="s">static</span>
+<span class="p">DISABLED</span>=<span class="s">no</span>
+<span class="p">CONFIG_IPV4</span>=<span class="s">yes</span>
+<span class="p">NM_CONTROLLED</span>=<span class="s">no</span>
+<span class="h">EOF</span>
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="HQ_CLI_CIDR">10.0.200.30/24</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_CLI_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>/ipv4address
+<span class="k">echo</span> <span class="s">&#x27;default via <span class="v" data-k="HQ_GW_CLI_IP">10.0.200.1</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_CLI_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>/ipv4route
+<span class="k">systemctl</span> restart network
+<span class="k">ping</span> <span class="o">-c3</span> <span class="v" data-k="HQ_GW_CLI_IP">10.0.200.1</span></code></pre></div>
+</section>
+<section class="step" id="t5" data-num="5" data-title="Безопасный удалённый доступ (SSH)">
+<div class="sh"><span class="snum">5</span><div><div class="exam">Задание 5</div><h3>Безопасный удалённый доступ (SSH)</h3></div></div>
+<p class="sd">Порт, только sshuser, 2 попытки входа, баннер. После этого на серверы заходите так: <code>ssh -p <span class="v" data-k="SSH_PORT">2027</span> sshuser@&lt;адрес&gt;</code>, затем <code>sudo -i</code>.</p>
+<div class="block" id="t5-1" data-dev="HQ-SRV|BR-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Настройка sshd"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-br">BR-SRV</span><span class="btitle">Настройка sshd</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="BANNER">Authorized access only</span>&#x27;</span> <span class="op">&gt;</span> /etc/openssh/banner
+
+<span class="k">sed</span> <span class="o">-i</span> <span class="o">-E</span> \
+  <span class="o">-e</span> <span class="s">&#x27;s/^#?Port .*/Port <span class="v" data-k="SSH_PORT">2027</span>/&#x27;</span> \
+  <span class="o">-e</span> <span class="s">&#x27;s/^#?MaxAuthTries .*/MaxAuthTries 2/&#x27;</span> \
+  <span class="o">-e</span> <span class="s">&#x27;s|^#?Banner .*|Banner /etc/openssh/banner|&#x27;</span> \
+  /etc/openssh/sshd_config
+<span class="k">echo</span> <span class="s">&#x27;AllowUsers sshuser&#x27;</span> <span class="op">&gt;&gt;</span> /etc/openssh/sshd_config
+
+<span class="k">systemctl</span> enable sshd
+<span class="k">systemctl</span> restart sshd
+<span class="k">grep</span> <span class="o">-E</span> <span class="s">&#x27;^(Port|MaxAuthTries|Banner|AllowUsers)&#x27;</span> /etc/openssh/sshd_config</code></pre></div><div class="block chk" id="t5-2" data-dev="HQ-CLI" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">ssh</span> <span class="o">-p</span> <span class="v" data-k="SSH_PORT">2027</span> sshuser@<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>
+<span class="k">ssh</span> <span class="o">-p</span> <span class="v" data-k="SSH_PORT">2027</span> sshuser@<span class="v" data-k="BR_SRV_IP">10.1.100.10</span>   <span class="c"># после заданий 6–7</span></code></pre></div>
+</section>
+<section class="step" id="t6" data-num="6" data-title="IP-туннель GRE">
+<div class="sh"><span class="snum">6</span><div><div class="exam">Задание 6</div><h3>IP-туннель GRE</h3></div></div>
+<p class="sd">Минимальная маска для двух адресов туннеля — /30.</p>
+<div class="block" id="t6-1" data-dev="HQ-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: gre1 → BR-RTR"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">gre1 → BR-RTR</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/gre1
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/net/ifaces/gre1/options <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">TYPE</span>=<span class="s">iptun</span>
+<span class="p">TUNTYPE</span>=<span class="s">gre</span>
+<span class="p">TUNLOCAL</span>=<span class="s"><span class="v" data-k="HQ_WAN_IP">172.16.1.2</span></span>
+<span class="p">TUNREMOTE</span>=<span class="s"><span class="v" data-k="BR_WAN_IP">172.16.2.2</span></span>
+<span class="p">TUNTTL</span>=<span class="s">255</span>
+<span class="p">TUNOPTIONS</span>=<span class="s">&#x27;ttl 255&#x27;</span>
+<span class="p">HOST</span>=<span class="s"><span class="v" data-k="HQ_WAN_IF">enp0s10</span></span>
+<span class="p">BOOTPROTO</span>=<span class="s">static</span>
+<span class="p">DISABLED</span>=<span class="s">no</span>
+<span class="p">CONFIG_IPV4</span>=<span class="s">yes</span>
+<span class="h">EOF</span>
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="GRE_HQ">10.10.10.1/30</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/gre1/ipv4address
+<span class="k">systemctl</span> restart network
+<span class="k">ip</span> <span class="o">-br</span> a show gre1</code></pre></div><div class="block" id="t6-2" data-dev="BR-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: gre1 → HQ-RTR"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-RTR</span><span class="btitle">gre1 → HQ-RTR</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/gre1
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/net/ifaces/gre1/options <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">TYPE</span>=<span class="s">iptun</span>
+<span class="p">TUNTYPE</span>=<span class="s">gre</span>
+<span class="p">TUNLOCAL</span>=<span class="s"><span class="v" data-k="BR_WAN_IP">172.16.2.2</span></span>
+<span class="p">TUNREMOTE</span>=<span class="s"><span class="v" data-k="HQ_WAN_IP">172.16.1.2</span></span>
+<span class="p">TUNTTL</span>=<span class="s">255</span>
+<span class="p">TUNOPTIONS</span>=<span class="s">&#x27;ttl 255&#x27;</span>
+<span class="p">HOST</span>=<span class="s"><span class="v" data-k="BR_WAN_IF">enp0s9</span></span>
+<span class="p">BOOTPROTO</span>=<span class="s">static</span>
+<span class="p">DISABLED</span>=<span class="s">no</span>
+<span class="p">CONFIG_IPV4</span>=<span class="s">yes</span>
+<span class="h">EOF</span>
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="GRE_BR_CIDR">10.10.10.2/30</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/gre1/ipv4address
+<span class="k">systemctl</span> restart network
+<span class="k">ip</span> <span class="o">-br</span> a show gre1</code></pre></div><div class="block chk" id="t6-3" data-dev="HQ-RTR" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">ping</span> <span class="o">-c3</span> <span class="v" data-k="GRE_BR">10.10.10.2</span></code></pre></div>
+</section>
+<section class="step" id="t7" data-num="7" data-title="Динамическая маршрутизация OSPF">
+<div class="sh"><span class="snum">7</span><div><div class="exam">Задание 7</div><h3>Динамическая маршрутизация OSPF</h3></div></div>
+<p class="sd">FRR, area 0. Все интерфейсы пассивны, OSPF работает только на gre1. Аутентификация MD5.</p>
+<div class="block" id="t7-1" data-dev="HQ-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: FRR / ospfd"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">FRR / ospfd</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">sed</span> <span class="o">-i</span> <span class="s">&#x27;s/^ospfd=no/ospfd=yes/&#x27;</span> /etc/frr/daemons
+
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/frr/frr.conf <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">frr</span> defaults traditional
+<span class="p">hostname</span> <span class="v" data-k="H_HQRTR">hq-rtr.au-team.irpo</span>
+<span class="p">log</span> syslog informational
+<span class="c">!</span>
+<span class="p">interface</span> gre1
+ <span class="p">ip</span> ospf network point-to-point
+ <span class="p">ip</span> ospf authentication message-digest
+ <span class="p">ip</span> ospf message-digest-key 1 md5 <span class="v" data-k="PW">P@ssw0rd</span>
+ <span class="p">no</span> ip ospf passive
+<span class="p">exit</span>
+<span class="c">!</span>
+<span class="p">router</span> ospf
+ <span class="p">ospf</span> router-id <span class="v" data-k="GRE_HQ_IP">10.10.10.1</span>
+ <span class="p">passive-interface</span> default
+ <span class="p">network</span> <span class="v" data-k="HQ_GW_SRV_SUBNET">10.0.100.0/24</span> area 0
+ <span class="p">network</span> <span class="v" data-k="HQ_GW_CLI_SUBNET">10.0.200.0/24</span> area 0
+ <span class="p">network</span> <span class="v" data-k="HQ_GW_MGMT_SUBNET">10.0.99.0/24</span> area 0
+ <span class="p">network</span> <span class="v" data-k="GRE_HQ_SUBNET">10.10.10.0/30</span> area 0
+<span class="p">exit</span>
+<span class="c">!</span>
+<span class="p">line</span> vty
+<span class="c">!</span>
+<span class="h">EOF</span>
+<span class="k">systemctl</span> enable <span class="o">--now</span> frr
+<span class="k">systemctl</span> restart frr</code></pre></div><div class="block" id="t7-2" data-dev="BR-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: FRR / ospfd"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-RTR</span><span class="btitle">FRR / ospfd</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">sed</span> <span class="o">-i</span> <span class="s">&#x27;s/^ospfd=no/ospfd=yes/&#x27;</span> /etc/frr/daemons
+
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/frr/frr.conf <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">frr</span> defaults traditional
+<span class="p">hostname</span> <span class="v" data-k="H_BRRTR">br-rtr.au-team.irpo</span>
+<span class="p">log</span> syslog informational
+<span class="c">!</span>
+<span class="p">interface</span> gre1
+ <span class="p">ip</span> ospf network point-to-point
+ <span class="p">ip</span> ospf authentication message-digest
+ <span class="p">ip</span> ospf message-digest-key 1 md5 <span class="v" data-k="PW">P@ssw0rd</span>
+ <span class="p">no</span> ip ospf passive
+<span class="p">exit</span>
+<span class="c">!</span>
+<span class="p">router</span> ospf
+ <span class="p">ospf</span> router-id <span class="v" data-k="GRE_BR">10.10.10.2</span>
+ <span class="p">passive-interface</span> default
+ <span class="p">network</span> <span class="v" data-k="BR_GW_SRV_SUBNET">10.1.100.0/28</span> area 0
+ <span class="p">network</span> <span class="v" data-k="BR_GW_MGMT_SUBNET">10.1.99.0/28</span> area 0
+ <span class="p">network</span> <span class="v" data-k="GRE_HQ_SUBNET">10.10.10.0/30</span> area 0
+<span class="p">exit</span>
+<span class="c">!</span>
+<span class="p">line</span> vty
+<span class="c">!</span>
+<span class="h">EOF</span>
+<span class="k">systemctl</span> enable <span class="o">--now</span> frr
+<span class="k">systemctl</span> restart frr</code></pre></div><div class="block chk" id="t7-3" data-dev="HQ-RTR|BR-RTR" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка: сосед в состоянии Full"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="dev d-br">BR-RTR</span><span class="btitle">Проверка: сосед в состоянии Full</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">vtysh</span> <span class="o">-c</span> <span class="s">&#x27;show ip ospf neighbor&#x27;</span>
+<span class="k">vtysh</span> <span class="o">-c</span> <span class="s">&#x27;show ip route ospf&#x27;</span></code></pre></div>
+</section>
+<section class="step" id="t8" data-num="8" data-title="Динамическая трансляция адресов (NAT)">
+<div class="sh"><span class="snum">8</span><div><div class="exam">Задание 8</div><h3>Динамическая трансляция адресов (NAT)</h3></div></div>
+<p class="sd">Masquerade в сторону ISP. Трафик между офисами идёт через gre1 и не транслируется.</p>
+<div class="block" id="t8-1" data-dev="HQ-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: NAT → ISP (enp0s10)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">NAT → ISP (<span class="v" data-k="HQ_WAN_IF">enp0s10</span>)</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">cat</span> <span class="op">&gt;</span> /etc/nftables/nftables.nft <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="c">#!/usr/sbin/nft -f</span>
+<span class="p">flush</span> ruleset
+
+<span class="p">table</span> ip nat {
+    <span class="p">chain</span> postrouting {
+        <span class="p">type</span> nat hook postrouting priority srcnat; policy accept;
+        <span class="p">oifname</span> &quot;<span class="v" data-k="HQ_WAN_IF">enp0s10</span>&quot; masquerade
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="h">EOF</span>
+<span class="k">systemctl</span> enable <span class="o">--now</span> nftables
+<span class="k">systemctl</span> restart nftables
+<span class="k">nft</span> list ruleset</code></pre></div><div class="block" id="t8-2" data-dev="BR-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: NAT → ISP (enp0s9)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-RTR</span><span class="btitle">NAT → ISP (<span class="v" data-k="BR_WAN_IF">enp0s9</span>)</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">cat</span> <span class="op">&gt;</span> /etc/nftables/nftables.nft <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="c">#!/usr/sbin/nft -f</span>
+<span class="p">flush</span> ruleset
+
+<span class="p">table</span> ip nat {
+    <span class="p">chain</span> postrouting {
+        <span class="p">type</span> nat hook postrouting priority srcnat; policy accept;
+        <span class="p">oifname</span> &quot;<span class="v" data-k="BR_WAN_IF">enp0s9</span>&quot; masquerade
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="h">EOF</span>
+<span class="k">systemctl</span> enable <span class="o">--now</span> nftables
+<span class="k">systemctl</span> restart nftables
+<span class="k">nft</span> list ruleset</code></pre></div><div class="block chk" id="t8-3" data-dev="HQ-SRV|BR-SRV" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-br">BR-SRV</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">ping</span> <span class="o">-c3</span> 77.88.8.8</code></pre></div>
+</section>
+<section class="step" id="t9" data-num="9" data-title="DHCP для HQ-CLI">
+<div class="sh"><span class="snum">9</span><div><div class="exam">Задание 9</div><h3>DHCP для HQ-CLI</h3></div></div>
+<p class="sd">Сервер — HQ-RTR, только на VLAN клиентов. Адрес маршрутизатора исключён из пула; HQ-CLI получает зарезервированный адрес по MAC.</p>
+<div class="block" id="t9-1" data-dev="HQ-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: dhcpd"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">dhcpd</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">cat</span> <span class="op">&gt;</span> /etc/dhcp/dhcpd.conf <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">option</span> domain-name &quot;<span class="v" data-k="DOMAIN">au-team.irpo</span>&quot;;
+<span class="p">option</span> domain-name-servers <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>;
+<span class="p">default-lease-time</span> 600;
+<span class="p">max-lease-time</span> 7200;
+<span class="p">authoritative;</span>
+
+<span class="p">subnet</span> <span class="v" data-k="HQ_GW_CLI_NET">10.0.200.0</span> netmask <span class="v" data-k="HQ_GW_CLI_MASK">255.255.255.0</span> {
+    <span class="p">range</span> <span class="v" data-k="DHCP_FROM">10.0.200.50</span> <span class="v" data-k="DHCP_TO">10.0.200.150</span>;
+    <span class="p">option</span> routers <span class="v" data-k="HQ_GW_CLI_IP">10.0.200.1</span>;
+<span class="p">}</span>
+
+<span class="c"># MAC HQ-CLI: ip link show <span class="v" data-k="HQ_CLI_IF">enp0s9</span></span>
+<span class="p">host</span> hq-cli {
+    <span class="p">hardware</span> ethernet <span class="v" data-k="HQ_CLI_MAC">08:00:27:ee:f2:7c</span>;
+    <span class="p">fixed-address</span> <span class="v" data-k="HQ_CLI_IP">10.0.200.30</span>;
+<span class="p">}</span>
+<span class="h">EOF</span>
+<span class="k">dhcpd</span> <span class="o">-t</span> <span class="o">-cf</span> /etc/dhcp/dhcpd.conf
+
+<span class="k">mkdir</span> <span class="o">-p</span> /etc/systemd/system/dhcpd.service.d
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/systemd/system/dhcpd.service.d/override.conf <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">[Service]</span>
+<span class="p">ExecStart</span>=<span class="s"></span>
+<span class="p">ExecStart</span>=<span class="s">/usr/sbin/dhcpd -f -q -cf /etc/dhcp/dhcpd.conf <span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span></span>
+<span class="h">EOF</span>
+<span class="k">systemctl</span> daemon-reload
+<span class="k">systemctl</span> enable <span class="o">--now</span> dhcpd
+<span class="k">systemctl</span> restart dhcpd
+<span class="k">systemctl</span> status dhcpd <span class="o">--no-pager</span></code></pre></div><div class="block" id="t9-2" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Перевести VLAN 200 на DHCP"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Перевести VLAN <span class="v" data-k="V_CLI">200</span> на DHCP</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="HQ_CLI_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_CLI_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>/options <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">TYPE</span>=<span class="s">vlan</span>
+<span class="p">HOST</span>=<span class="s"><span class="v" data-k="HQ_CLI_IF">enp0s9</span></span>
+<span class="p">VID</span>=<span class="s"><span class="v" data-k="V_CLI">200</span></span>
+<span class="p">BOOTPROTO</span>=<span class="s">dhcp</span>
+<span class="p">DISABLED</span>=<span class="s">no</span>
+<span class="p">CONFIG_IPV4</span>=<span class="s">yes</span>
+<span class="p">NM_CONTROLLED</span>=<span class="s">no</span>
+<span class="h">EOF</span>
+<span class="k">rm</span> <span class="o">-f</span> /etc/net/ifaces/<span class="v" data-k="HQ_CLI_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>/ipv4address /etc/net/ifaces/<span class="v" data-k="HQ_CLI_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>/ipv4route
+<span class="k">systemctl</span> restart network
+<span class="k">ip</span> <span class="o">-br</span> a show <span class="v" data-k="HQ_CLI_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>
+<span class="k">cat</span> /etc/resolv.conf</code></pre></div>
+</section>
+<section class="step" id="t10" data-num="10" data-title="DNS (BIND на HQ-SRV)">
+<div class="sh"><span class="snum">10</span><div><div class="exam">Задание 10</div><h3>DNS (BIND на HQ-SRV)</h3></div></div>
+<p class="sd">Зона и обратные зоны по таблице 3 КИМ. BIND работает в chroot <code>/var/lib/bind</code>, поэтому путь <code>/zone</code> = <code>/var/lib/bind/zone</code>.</p>
+<div class="block" id="t10-1" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: options.conf и зоны"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">options.conf и зоны</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">cat</span> <span class="op">&gt;</span> /etc/bind/options.conf <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">options</span> {
+    <span class="p">directory</span> &quot;/zone&quot;;
+    <span class="p">pid-file</span> none;
+    <span class="p">listen-on</span> { 127.0.0.1; <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>; };
+    <span class="p">listen-on-v6</span> { none; };
+    <span class="p">allow-query</span> { any; };
+    <span class="p">recursion</span> yes;
+    <span class="p">allow-recursion</span> { any; };
+    <span class="p">forwarders</span> { <span class="v" data-k="DNS_FWD">77.88.8.7</span>; };
+    <span class="p">forward</span> first;
+    <span class="p">dnssec-validation</span> no;
+<span class="p">};</span>
+<span class="h">EOF</span>
+
+<span class="k">cat</span> <span class="op">&gt;&gt;</span> /etc/bind/local.conf <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">zone</span> &quot;<span class="v" data-k="DOMAIN">au-team.irpo</span>&quot; {
+    <span class="p">type</span> master;
+    <span class="p">file</span> &quot;/zone/<span class="v" data-k="DOMAIN">au-team.irpo</span>.zone&quot;;
+<span class="p">};</span>
+<span class="p">zone</span> &quot;<span class="v" data-k="REV_HQ">100.0.10.in-addr.arpa</span>&quot; {
+    <span class="p">type</span> master;
+    <span class="p">file</span> &quot;/zone/<span class="v" data-k="REV_HQ_FILE">10.0.100.rev</span>&quot;;
+<span class="p">};</span>
+<span class="p">zone</span> &quot;<span class="v" data-k="REV_BR">100.1.10.in-addr.arpa</span>&quot; {
+    <span class="p">type</span> master;
+    <span class="p">file</span> &quot;/zone/<span class="v" data-k="REV_BR_FILE">10.1.100.rev</span>&quot;;
+<span class="p">};</span>
+<span class="h">EOF</span>
+<span class="k">named-checkconf</span></code></pre></div><div class="block" id="t10-2" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Файлы зон"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Файлы зон</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">mkdir</span> <span class="o">-p</span> /var/lib/bind/zone
+<span class="k">cat</span> <span class="op">&gt;</span> /var/lib/bind/zone/<span class="v" data-k="DOMAIN">au-team.irpo</span>.zone <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">$TTL</span> 1D
+<span class="p">@</span>       IN SOA  <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>. root.<span class="v" data-k="DOMAIN">au-team.irpo</span>. (
+                <span class="p">2027010101</span><span class="c"> ; serial</span>
+                <span class="p">12H</span>       <span class="c"> ; refresh</span>
+                <span class="p">1H</span>        <span class="c"> ; retry</span>
+                <span class="p">1W</span>        <span class="c"> ; expire</span>
+                <span class="p">1H</span> )      <span class="c"> ; minimum</span>
+        <span class="p">IN</span> NS   <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>.
+<span class="p">hq-rtr</span>  IN A    <span class="v" data-k="HQ_GW_MGMT_IP">10.0.99.1</span>
+<span class="p">br-rtr</span>  IN A    <span class="v" data-k="BR_GW_MGMT_IP">10.1.99.1</span>
+<span class="p">br-fw</span>   IN A    <span class="v" data-k="BR_FW_IP">10.1.99.2</span>
+<span class="p">hq-srv</span>  IN A    <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>
+<span class="p">hq-cli</span>  IN A    <span class="v" data-k="HQ_CLI_IP">10.0.200.30</span>
+<span class="p">br-srv</span>  IN A    <span class="v" data-k="BR_SRV_IP">10.1.100.10</span>
+<span class="p">docker</span>  IN A    <span class="v" data-k="ISP_HQ_IP">172.16.1.1</span>
+<span class="p">web</span>     IN A    <span class="v" data-k="ISP_BR_IP">172.16.2.1</span>
+<span class="h">EOF</span>
+
+<span class="k">cat</span> <span class="op">&gt;</span> /var/lib/bind/zone/<span class="v" data-k="REV_HQ_FILE">10.0.100.rev</span> <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">$TTL</span> 1D
+<span class="p">@</span>   IN SOA <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>. root.<span class="v" data-k="DOMAIN">au-team.irpo</span>. ( 2027010101 12H 1H 1W 1H )
+    <span class="p">IN</span> NS  <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>.
+<span class="p"><span class="v" data-k="REV_HQ_PTR">20</span></span>  IN PTR <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>.
+<span class="h">EOF</span>
+
+<span class="k">cat</span> <span class="op">&gt;</span> /var/lib/bind/zone/<span class="v" data-k="REV_BR_FILE">10.1.100.rev</span> <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">$TTL</span> 1D
+<span class="p">@</span>   IN SOA <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>. root.<span class="v" data-k="DOMAIN">au-team.irpo</span>. ( 2027010101 12H 1H 1W 1H )
+    <span class="p">IN</span> NS  <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>.
+<span class="p"><span class="v" data-k="REV_BR_PTR">10</span></span>  IN PTR <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>.
+<span class="h">EOF</span>
+
+<span class="k">chown</span> named:named /var/lib/bind/zone/*
+<span class="k">chmod</span> 640 /var/lib/bind/zone/*
+<span class="k">named-checkzone</span> <span class="v" data-k="DOMAIN">au-team.irpo</span> /var/lib/bind/zone/<span class="v" data-k="DOMAIN">au-team.irpo</span>.zone
+<span class="k">named-checkzone</span> <span class="v" data-k="REV_HQ">100.0.10.in-addr.arpa</span> /var/lib/bind/zone/<span class="v" data-k="REV_HQ_FILE">10.0.100.rev</span>
+<span class="k">named-checkzone</span> <span class="v" data-k="REV_BR">100.1.10.in-addr.arpa</span> /var/lib/bind/zone/<span class="v" data-k="REV_BR_FILE">10.1.100.rev</span></code></pre></div><div class="block" id="t10-3" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Запуск и локальный резолвер"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Запуск и локальный резолвер</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">sed</span> <span class="o">-i</span> <span class="s">&#x27;s|^#\?CHROOT=.*|CHROOT=&quot;-t /var/lib/bind&quot;|&#x27;</span> /etc/sysconfig/bind
+<span class="k">grep</span> CHROOT /etc/sysconfig/bind
+<span class="k">systemctl</span> enable <span class="o">--now</span> bind
+<span class="k">systemctl</span> restart bind
+
+<span class="k">printf</span> <span class="s">&#x27;search <span class="v" data-k="DOMAIN">au-team.irpo</span>\nnameserver 127.0.0.1\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/resolv.conf
+<span class="k">systemctl</span> restart network</code></pre></div><div class="block chk" id="t10-4" data-dev="HQ-SRV|HQ-CLI" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-hq">HQ-CLI</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> <span class="v" data-k="H_HQRTR">hq-rtr.au-team.irpo</span> +short
+<span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span> +short
+<span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> <span class="o">-x</span> <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> +short
+<span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> <span class="o">-x</span> <span class="v" data-k="BR_SRV_IP">10.1.100.10</span> +short
+<span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> ya.ru +short</code></pre></div>
+</section>
+<section class="step" id="t11" data-num="11" data-title="Часовой пояс">
+<div class="sh"><span class="snum">11</span><div><div class="exam">Задание 11</div><h3>Часовой пояс</h3></div></div>
+<p class="sd">На всех устройствах — по месту проведения экзамена.</p>
+<div class="block" id="t11-1" data-dev="Все ВМ" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Часовой пояс"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-all">Все ВМ</span><span class="btitle">Часовой пояс</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">timedatectl</span> set-timezone <span class="v" data-k="TZ">Europe/Moscow</span>
+<span class="k">timedatectl</span></code></pre></div>
+</section>
+<section class="step" id="check" data-num="✓" data-title="Итоговая проверка">
+<div class="sh"><span class="snum">✓</span><div><div class="exam">вне КИМ</div><h3>Итоговая проверка</h3></div></div>
+<p class="sd">Быстрый прогон перед сдачей.</p>
+<div class="block chk" id="check-1" data-dev="HQ-CLI" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Связность, DNS, SSH"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Связность, DNS, SSH</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">ip</span> <span class="o">-br</span> a
+<span class="k">ip</span> route
+<span class="k">ping</span> <span class="o">-c2</span> <span class="v" data-k="HQ_GW_CLI_IP">10.0.200.1</span>
+<span class="k">ping</span> <span class="o">-c2</span> <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>
+<span class="k">ping</span> <span class="o">-c2</span> <span class="v" data-k="BR_SRV_IP">10.1.100.10</span>
+<span class="k">ping</span> <span class="o">-c2</span> 77.88.8.8
+<span class="k">host</span> <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>
+<span class="k">host</span> ya.ru
+<span class="k">ssh</span> <span class="o">-p</span> <span class="v" data-k="SSH_PORT">2027</span> sshuser@<span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span></code></pre></div><div class="block chk" id="check-2" data-dev="HQ-RTR|BR-RTR" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Маршрутизация и NAT"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="dev d-br">BR-RTR</span><span class="btitle">Маршрутизация и NAT</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">ip</span> <span class="o">-br</span> a
+<span class="k">vtysh</span> <span class="o">-c</span> <span class="s">&#x27;show ip ospf neighbor&#x27;</span>
+<span class="k">vtysh</span> <span class="o">-c</span> <span class="s">&#x27;show ip route&#x27;</span>
+<span class="k">nft</span> list ruleset
+<span class="k">systemctl</span> is-active frr nftables</code></pre></div>
+</section>
+<footer>
+<p>Стенд: Панков С. А., НовГУ · Порядок по КИМ 09.02.06-1-2027, Том 1 · ALT Linux (etcnet)</p>
+<p class="noprint"><button type="button" class="linkbtn" onclick="window.print()">Версия для печати</button></p>
+</footer>
+</main>
+</div>
+<a class="top" href="#" aria-label="Наверх">↑</a>
+<dialog class="params" id="params" aria-labelledby="ptitle">
+<form method="dialog" class="pform" novalidate>
+<div class="phead"><h2 id="ptitle">Параметры сети</h2><button type="button" class="x" data-close aria-label="Закрыть">×</button></div>
+<p class="pnote">Измените значения и нажмите «Пересобрать команды» — подставятся во все блоки, таблицы и схему. Параметры общие для обоих модулей.</p>
+<div class="pbody" data-pbody></div>
+<div class="pmsg" data-pmsg aria-live="polite"></div>
+<div class="pfoot">
+<button type="button" class="primary" data-apply>Пересобрать команды</button>
+<button type="button" data-preset>Маски по КИМ</button>
+<button type="button" data-defaults>Значения стенда</button>
+<button type="button" data-export>Экспорт</button>
+<label class="filebtn">Импорт<input type="file" accept=".json,application/json" data-import hidden></label>
+</div>
+</form>
+</dialog>
+<div class="toast" data-toast role="status" aria-live="polite"></div>
+<script src="assets/params.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

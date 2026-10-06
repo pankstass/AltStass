@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Модуль 2 — сетевое администрирование · стенд au-team.irpo</title>
+<meta name="description" content="Документация сети и команды настройки учебного стенда (ALT Linux) в порядке заданий демоэкзамена 09.02.06. Команды пересобираются под ваши параметры сети.">
+<meta name="theme-color" content="#121212">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="alt stass · стенд au-team.irpo">
+<meta property="og:title" content="Модуль 2 — сетевое администрирование · стенд au-team.irpo">
+<meta property="og:description" content="Документация сети и команды настройки стенда ДЭ 09.02.06 (ALT Linux) с копированием в один клик.">
+<meta property="og:url" content="https://pankstass.github.io/AltStass/module2.html">
+<meta property="og:image" content="https://pankstass.github.io/AltStass/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/favicon.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="m2">
+<a class="skip" href="#cmds">К командам</a>
+<div class="wrap">
+<aside aria-label="Навигация">
+<a class="logo" href="index.html" aria-label="alt stass — на главную"><img src="assets/logo.webp" alt="alt stass" width="360" height="319"></a>
+<nav class="mods" aria-label="Модули"><a href="index.html" >Модуль 1</a><a href="module2.html" aria-current="page">Модуль 2</a></nav>
+<button type="button" class="pbtn side" data-open-params>⚙ Параметры сети</button>
+<div class="lbl">Документация</div>
+<ul class="toc">
+<li><a href="#needs"><span class="n">·</span><span class="tt">Подготовка</span></a></li>
+<li><a href="#services"><span class="n">·</span><span class="tt">Службы Модуля 2</span></a></li>
+</ul>
+<div class="lbl">Команды <span class="prog-txt" data-prog-txt></span></div>
+<ul class="toc">
+<li><a href="#m2t1" data-step="m2t1"><span class="n">1</span><span class="tt">Контроллер домена Samba DC</span><span class="cnt" data-cnt="m2t1"></span></a></li>
+<li><a href="#m2t2" data-step="m2t2"><span class="n">2</span><span class="tt">Файловое хранилище RAID 0</span><span class="cnt" data-cnt="m2t2"></span></a></li>
+<li><a href="#m2t3" data-step="m2t3"><span class="n">3</span><span class="tt">Сервер NFS</span><span class="cnt" data-cnt="m2t3"></span></a></li>
+<li><a href="#m2t4" data-step="m2t4"><span class="n">4</span><span class="tt">Служба времени chrony</span><span class="cnt" data-cnt="m2t4"></span></a></li>
+<li><a href="#m2t5" data-step="m2t5"><span class="n">5</span><span class="tt">Ansible на BR-SRV</span><span class="cnt" data-cnt="m2t5"></span></a></li>
+<li><a href="#m2t6" data-step="m2t6"><span class="n">6</span><span class="tt">Веб-приложение в Docker</span><span class="cnt" data-cnt="m2t6"></span></a></li>
+<li><a href="#m2t7" data-step="m2t7"><span class="n">7</span><span class="tt">Веб-приложение на Apache</span><span class="cnt" data-cnt="m2t7"></span></a></li>
+<li><a href="#m2t8" data-step="m2t8"><span class="n">8</span><span class="tt">Статическая трансляция портов</span><span class="cnt" data-cnt="m2t8"></span></a></li>
+<li><a href="#m2t9" data-step="m2t9"><span class="n">9</span><span class="tt">Яндекс Браузер на HQ-CLI</span><span class="cnt" data-cnt="m2t9"></span></a></li>
+</ul>
+<button type="button" class="linkbtn reset-done" data-reset-done>Сбросить отметки «готово»</button>
+</aside>
+<main>
+<header>
+<img class="mlogo" src="assets/logo.webp" alt="alt stass" width="360" height="319">
+<nav class="mods mmods" aria-label="Модули"><a href="index.html" >Модуль 1</a><a href="module2.html" aria-current="page">Модуль 2</a></nav>
+<h1>Модуль 2 · <em>администрирование</em></h1>
+<p>Команды для Задания 2 КИМ 09.02.06-1-2027: домен, хранилище, NFS, время, Ansible, Docker, веб-приложения, проброс портов.</p>
+<div class="hbar">
+<button type="button" class="pbtn" data-open-params>⚙ Параметры сети</button>
+<span class="pstate" data-pstate>Параметры стенда по умолчанию</span>
+</div>
+<div class="prog" aria-hidden="true"><span data-prog></span></div>
+</header>
+
+<h2 id="docs">Что понадобится</h2>
+<p class="lead">Модуль 2 выполняется поверх готового Модуля 1. <span class="hint">Значения с подчёркиванием берутся из <button type="button" class="linkbtn" data-open-params>параметров сети</button>.</span></p>
+<div class="note"><b>Черновик.</b> Команды Модуля 2 собраны по документации ALT Linux и на стенде не прогонялись. Сверяйте имена файлов на Additional.iso и вывод проверок.</div>
+<h4 id="needs">Подготовка в VirtualBox</h4>
+<div class="tw"><table>
+<tr><th>ВМ</th><th>Что подключить</th><th>Для заданий</th></tr>
+<tr><td><span class="dev d-hq">HQ-SRV</span></td><td>Два диска по 1 ГБ (<code><span class="v" data-k="RAID_D1">/dev/sdb</span></code>, <code><span class="v" data-k="RAID_D2">/dev/sdc</span></code>), Additional.iso (<code><span class="v" data-k="ISO_DEV">/dev/sr0</span></code>)</td><td>2, 3, 7</td></tr>
+<tr><td><span class="dev d-br">BR-SRV</span></td><td>Additional.iso (<code><span class="v" data-k="ISO_DEV">/dev/sr0</span></code>)</td><td>6</td></tr>
+<tr><td><span class="dev d-hq">HQ-CLI</span></td><td>Доступ в Интернет через HQ-RTR</td><td>1, 9</td></tr>
+</table></div>
+<h4 id="services">Службы Модуля 2</h4>
+<div class="tw"><table class="svc">
+<tr><th>Служба</th><th>Где</th><th>Параметры</th></tr>
+<tr><td>Samba AD DC</td><td>BR-SRV</td><td>Realm <span class="v" data-k="REALM">AU-TEAM.IRPO</span>, NetBIOS <span class="v" data-k="WG">AU-TEAM</span>, внутренний DNS с пересылкой на <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>, группа <code>hq</code>, hquser1…<span class="v" data-k="HQ_USERS">5</span></td></tr>
+<tr><td>RAID 0</td><td>HQ-SRV</td><td><code>/dev/md0</code> из <span class="v" data-k="RAID_D1">/dev/sdb</span> + <span class="v" data-k="RAID_D2">/dev/sdc</span>, ext4, <code>/raid</code></td></tr>
+<tr><td>NFS</td><td>HQ-SRV → HQ-CLI</td><td><code>/raid/nfs</code> rw для <span class="v" data-k="HQ_GW_CLI_SUBNET">10.0.200.0/24</span> → <code>/mnt/nfs</code></td></tr>
+<tr><td>NTP (chrony)</td><td>ISP</td><td>Вышестоящий <span class="v" data-k="NTP_UP">ntp1.vniiftri.ru</span>, stratum 5, клиенты HQ-SRV, HQ-CLI, BR-RTR, BR-SRV</td></tr>
+<tr><td>Ansible</td><td>BR-SRV</td><td><code>/etc/ansible</code>, инвентарь: HQ-SRV, HQ-CLI, HQ-RTR, BR-RTR</td></tr>
+<tr><td>Docker testapp</td><td>BR-SRV</td><td>site_latest + mariadb_latest, порт <span class="v" data-k="APP_PORT">8080</span></td></tr>
+<tr><td>Apache + MariaDB</td><td>HQ-SRV</td><td>БД <code>webdb</code>, пользователь <code>web</code> / <code><span class="v" data-k="PW">P@ssw0rd</span></code>, порт <span class="v" data-k="WEB_PORT">80</span></td></tr>
+<tr><td>Проброс портов</td><td>HQ-RTR, BR-RTR</td><td><span class="v" data-k="EXT_PORT">8080</span> → веб-приложения, <span class="v" data-k="SSH_PORT">2027</span> → SSH серверов</td></tr>
+</table></div>
+
+
+<h2 id="cmds">Команды настройки</h2>
+<p class="lead">Каждый блок копируется целиком и вставляется в терминал под root. Отмечайте выполненные блоки галочкой — отметки сохраняются в браузере.</p>
+<div class="filter" role="search">
+<div class="frow" role="group" aria-label="Фильтр по устройству">
+<button type="button" data-f="" aria-pressed="true">Все</button><button type="button" data-f="ISP" aria-pressed="false">ISP</button><button type="button" data-f="HQ-RTR" aria-pressed="false">HQ-RTR</button><button type="button" data-f="HQ-SRV" aria-pressed="false">HQ-SRV</button><button type="button" data-f="HQ-CLI" aria-pressed="false">HQ-CLI</button><button type="button" data-f="BR-RTR" aria-pressed="false">BR-RTR</button><button type="button" data-f="BR-SRV" aria-pressed="false">BR-SRV</button>
+</div>
+<div class="frow">
+<label class="search"><span class="sr">Поиск по командам</span><input type="search" placeholder="Поиск по командам…" data-search autocomplete="off"></label>
+<label class="tgl"><input type="checkbox" data-hl checked> Подсветка параметров</label>
+</div>
+<div class="devact" data-devact hidden>
+<span data-devact-txt></span>
+<button type="button" class="act" data-copy-all>Скопировать всё</button>
+<button type="button" class="act" data-download>Скачать .sh</button>
+</div>
+</div>
+<p class="empty" data-empty hidden>Ничего не найдено.</p>
+<section class="step" id="m2t1" data-num="1" data-title="Контроллер домена Samba DC">
+<div class="sh"><span class="snum">1</span><div><div class="exam">Задание 1</div><h3>Контроллер домена Samba DC</h3></div></div>
+<p class="sd">Домен поднимается на BR-SRV с внутренним DNS Samba. HQ-CLI по-прежнему использует DNS HQ-SRV, поэтому на HQ-SRV добавляются SRV-записи, указывающие на контроллер. Kerberos чувствителен ко времени: при ошибке <code>Clock skew</code> сначала выполните задание 4.</p>
+<div class="block" id="m2t1-1" data-dev="BR-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Установка и развёртывание домена"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Установка и развёртывание домена</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> update <span class="op">&amp;&amp;</span> <span class="k">apt-get</span> install <span class="o">-y</span> task-samba-dc
+<span class="k">grep</span> <span class="o">-q</span> <span class="s">&#x27;<span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>&#x27;</span> /etc/hosts <span class="op">||</span> <span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="BR_SRV_IP">10.1.100.10</span> <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span> br-srv&#x27;</span> <span class="op">&gt;&gt;</span> /etc/hosts
+<span class="k">rm</span> <span class="o">-f</span> /etc/samba/smb.conf
+<span class="k">rm</span> <span class="o">-rf</span> /var/lib/samba /var/cache/samba
+<span class="k">mkdir</span> <span class="o">-p</span> /var/lib/samba/sysvol
+<span class="k">samba-tool</span> domain provision <span class="o">--realm=<span class="v" data-k="REALM">AU-TEAM.IRPO</span></span> <span class="o">--domain=<span class="v" data-k="WG">AU-TEAM</span></span> \
+  <span class="o">--server-role=dc</span> <span class="o">--dns-backend=SAMBA_INTERNAL</span> \
+  <span class="o">--adminpass=</span><span class="s">&#x27;<span class="v" data-k="PW">P@ssw0rd</span>&#x27;</span> <span class="o">--option=</span><span class="s">&#x27;dns forwarder = <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>&#x27;</span>
+<span class="k">cp</span> <span class="o">-f</span> /var/lib/samba/private/krb5.conf /etc/krb5.conf
+<span class="k">systemctl</span> enable <span class="o">--now</span> samba
+<span class="k">printf</span> <span class="s">&#x27;search <span class="v" data-k="DOMAIN">au-team.irpo</span>\nnameserver 127.0.0.1\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/resolv.conf
+<span class="k">systemctl</span> restart network
+<span class="k">samba-tool</span> domain info 127.0.0.1</code></pre></div><div class="block" id="m2t1-2" data-dev="BR-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Политика паролей, пользователи и группа hq"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Политика паролей, пользователи и группа hq</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">samba-tool</span> domain passwordsettings set <span class="o">--min-pwd-length=8</span> \
+  <span class="o">--account-lockout-threshold=5</span> <span class="o">--account-lockout-duration=30</span> \
+  <span class="o">--reset-account-lockout-after=30</span>
+<span class="k">samba-tool</span> group add hq
+<span class="k">for</span> i in <span class="var">$(seq</span> 1 <span class="v" data-k="HQ_USERS">5</span>); <span class="k">do</span>
+  <span class="k">samba-tool</span> user add hquser$i <span class="s">&#x27;<span class="v" data-k="PW">P@ssw0rd</span>&#x27;</span>
+  <span class="k">samba-tool</span> group addmembers hq hquser$i
+<span class="k">done</span>
+<span class="k">samba-tool</span> group listmembers hq
+<span class="k">samba-tool</span> domain passwordsettings show</code></pre></div><div class="block" id="m2t1-3" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: SRV-записи контроллера в BIND"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">SRV-записи контроллера в BIND</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">cat</span> <span class="op">&gt;&gt;</span> /var/lib/bind/zone/<span class="v" data-k="DOMAIN">au-team.irpo</span>.zone <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">_ldap._tcp</span>               IN SRV 0 100 389  <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>.
+<span class="p">_ldap._tcp.dc._msdcs</span>     IN SRV 0 100 389  <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>.
+<span class="p">_kerberos._tcp</span>           IN SRV 0 100 88   <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>.
+<span class="p">_kerberos._udp</span>           IN SRV 0 100 88   <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>.
+<span class="p">_kerberos._tcp.dc._msdcs</span> IN SRV 0 100 88   <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>.
+<span class="p">_kpasswd._tcp</span>            IN SRV 0 100 464  <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>.
+<span class="p">_kpasswd._udp</span>            IN SRV 0 100 464  <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>.
+<span class="p">_gc._tcp</span>                 IN SRV 0 100 3268 <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>.
+<span class="h">EOF</span>
+<span class="k">sed</span> <span class="o">-i</span> <span class="s">&#x27;s/2027010101 ; serial/2027010102 ; serial/&#x27;</span> /var/lib/bind/zone/<span class="v" data-k="DOMAIN">au-team.irpo</span>.zone
+<span class="k">named-checkzone</span> <span class="v" data-k="DOMAIN">au-team.irpo</span> /var/lib/bind/zone/<span class="v" data-k="DOMAIN">au-team.irpo</span>.zone
+<span class="k">systemctl</span> restart bind
+<span class="k">dig</span> @127.0.0.1 _ldap._tcp.<span class="v" data-k="DOMAIN">au-team.irpo</span> SRV +short</code></pre></div><div class="block" id="m2t1-4" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Ввод в домен"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Ввод в домен</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> update <span class="op">&amp;&amp;</span> <span class="k">apt-get</span> install <span class="o">-y</span> task-auth-ad-sssd
+<span class="k">system-auth</span> write ad <span class="v" data-k="DOMAIN">au-team.irpo</span> hq-cli <span class="v" data-k="WG">AU-TEAM</span> <span class="s">&#x27;administrator&#x27;</span> <span class="s">&#x27;<span class="v" data-k="PW">P@ssw0rd</span>&#x27;</span>
+<span class="k">reboot</span></code></pre></div><div class="block" id="m2t1-5" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: sudo для группы hq: только cat, grep, id"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">sudo для группы hq: только cat, grep, id</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">control</span> sudo public
+<span class="k">echo</span> <span class="s">&quot;%hq ALL=(ALL) $(command -v cat), $(command -v grep), $(command -v id)&quot;</span> <span class="op">&gt;&gt;</span> /etc/sudoers
+<span class="k">visudo</span> <span class="o">-c</span></code></pre></div><div class="block chk" id="m2t1-6" data-dev="HQ-CLI" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">getent</span> passwd hquser1
+<span class="k">id</span> hquser1
+<span class="k">sudo</span> <span class="o">-l</span> <span class="o">-U</span> hquser1</code></pre></div>
+</section>
+<section class="step" id="m2t2" data-num="2" data-title="Файловое хранилище RAID 0">
+<div class="sh"><span class="snum">2</span><div><div class="exam">Задание 2</div><h3>Файловое хранилище RAID 0</h3></div></div>
+<p class="sd">Массив md0 из двух дополнительных дисков, раздел ext4, автомонтирование в <code>/raid</code>. Имена дисков проверьте по <code>lsblk</code>.</p>
+<div class="block" id="m2t2-1" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: mdadm, раздел, fstab"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">mdadm, раздел, fstab</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> install <span class="o">-y</span> mdadm
+<span class="k">lsblk</span>
+<span class="k">mdadm</span> <span class="o">--create</span> /dev/md0 <span class="o">--level=0</span> <span class="o">--raid-devices=2</span> <span class="v" data-k="RAID_D1">/dev/sdb</span> <span class="v" data-k="RAID_D2">/dev/sdc</span> <span class="o">--run</span>
+<span class="k">mdadm</span> <span class="o">--detail</span> <span class="o">--scan</span> <span class="op">&gt;</span> /etc/mdadm.conf
+<span class="k">echo</span> <span class="s">&#x27;type=83&#x27;</span> <span class="op">|</span> <span class="k">sfdisk</span> /dev/md0
+<span class="k">mkfs.ext4</span> <span class="o">-F</span> /dev/md0p1
+<span class="k">mkdir</span> <span class="o">-p</span> /raid
+<span class="k">echo</span> <span class="s">&#x27;/dev/md0p1 /raid ext4 defaults 0 0&#x27;</span> <span class="op">&gt;&gt;</span> /etc/fstab
+<span class="k">mount</span> <span class="o">-a</span>
+<span class="k">df</span> <span class="o">-h</span> /raid
+<span class="k">cat</span> /proc/mdstat</code></pre></div>
+</section>
+<section class="step" id="m2t3" data-num="3" data-title="Сервер NFS">
+<div class="sh"><span class="snum">3</span><div><div class="exam">Задание 3</div><h3>Сервер NFS</h3></div></div>
+<p class="sd">Каталог <code>/raid/nfs</code> с доступом на чтение и запись только для сети HQ-CLI; на клиенте — автомонтирование в <code>/mnt/nfs</code>.</p>
+<div class="block" id="m2t3-1" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Экспорт /raid/nfs"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Экспорт /raid/nfs</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> install <span class="o">-y</span> nfs-server
+<span class="k">mkdir</span> <span class="o">-p</span> /raid/nfs
+<span class="k">chmod</span> 777 /raid/nfs
+<span class="k">echo</span> <span class="s">&#x27;/raid/nfs <span class="v" data-k="HQ_GW_CLI_SUBNET">10.0.200.0/24</span>(rw,sync,no_subtree_check,no_root_squash)&#x27;</span> <span class="op">&gt;&gt;</span> /etc/exports
+<span class="k">systemctl</span> enable <span class="o">--now</span> nfs-server
+<span class="k">exportfs</span> <span class="o">-ra</span>
+<span class="k">exportfs</span> <span class="o">-v</span></code></pre></div><div class="block" id="m2t3-2" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Автомонтирование"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Автомонтирование</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> install <span class="o">-y</span> nfs-clients
+<span class="k">mkdir</span> <span class="o">-p</span> /mnt/nfs
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>:/raid/nfs /mnt/nfs nfs defaults,_netdev 0 0&#x27;</span> <span class="op">&gt;&gt;</span> /etc/fstab
+<span class="k">mount</span> <span class="o">-a</span>
+<span class="k">df</span> <span class="o">-h</span> /mnt/nfs
+<span class="k">touch</span> /mnt/nfs/test <span class="op">&amp;&amp;</span> <span class="k">ls</span> <span class="o">-l</span> /mnt/nfs</code></pre></div>
+</section>
+<section class="step" id="m2t4" data-num="4" data-title="Служба времени chrony">
+<div class="sh"><span class="snum">4</span><div><div class="exam">Задание 4</div><h3>Служба времени chrony</h3></div></div>
+<p class="sd">ISP — сервер stratum 5 (<code>minstratum 4</code> у вышестоящего источника даёт ровно 5). Клиенты обращаются к ближайшему адресу ISP, запросы проходят через NAT маршрутизаторов.</p>
+<div class="block" id="m2t4-1" data-dev="ISP" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: NTP-сервер"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">NTP-сервер</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> install <span class="o">-y</span> chrony
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/chrony.conf <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">server</span> <span class="v" data-k="NTP_UP">ntp1.vniiftri.ru</span> iburst minstratum 4
+<span class="p">local</span> stratum 5
+<span class="p">allow</span> <span class="v" data-k="ISP_HQ_SUBNET">172.16.1.0/28</span>
+<span class="p">allow</span> <span class="v" data-k="ISP_BR_SUBNET">172.16.2.0/28</span>
+<span class="p">driftfile</span> /var/lib/chrony/drift
+<span class="p">makestep</span> 1.0 3
+<span class="p">rtcsync</span>
+<span class="h">EOF</span>
+<span class="k">systemctl</span> enable <span class="o">--now</span> chronyd
+<span class="k">systemctl</span> restart chronyd
+<span class="k">chronyc</span> tracking <span class="op">|</span> <span class="k">grep</span> <span class="o">-i</span> stratum</code></pre></div><div class="block" id="m2t4-2" data-dev="HQ-SRV|HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Клиент (офис HQ)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-hq">HQ-CLI</span><span class="btitle">Клиент (офис HQ)</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> install <span class="o">-y</span> chrony
+<span class="k">sed</span> <span class="o">-i</span> <span class="o">-E</span> <span class="s">&#x27;/^(pool|server) /d&#x27;</span> /etc/chrony.conf
+<span class="k">echo</span> <span class="s">&#x27;server <span class="v" data-k="ISP_HQ_IP">172.16.1.1</span> iburst&#x27;</span> <span class="op">&gt;&gt;</span> /etc/chrony.conf
+<span class="k">systemctl</span> enable <span class="o">--now</span> chronyd
+<span class="k">systemctl</span> restart chronyd
+<span class="k">chronyc</span> sources</code></pre></div><div class="block" id="m2t4-3" data-dev="BR-RTR|BR-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Клиент (офис BR)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-RTR</span><span class="dev d-br">BR-SRV</span><span class="btitle">Клиент (офис BR)</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> install <span class="o">-y</span> chrony
+<span class="k">sed</span> <span class="o">-i</span> <span class="o">-E</span> <span class="s">&#x27;/^(pool|server) /d&#x27;</span> /etc/chrony.conf
+<span class="k">echo</span> <span class="s">&#x27;server <span class="v" data-k="ISP_BR_IP">172.16.2.1</span> iburst&#x27;</span> <span class="op">&gt;&gt;</span> /etc/chrony.conf
+<span class="k">systemctl</span> enable <span class="o">--now</span> chronyd
+<span class="k">systemctl</span> restart chronyd
+<span class="k">chronyc</span> sources</code></pre></div>
+</section>
+<section class="step" id="m2t5" data-num="5" data-title="Ansible на BR-SRV">
+<div class="sh"><span class="snum">5</span><div><div class="exam">Задание 5</div><h3>Ansible на BR-SRV</h3></div></div>
+<p class="sd">Подключение по ключам, чтобы <code>ansible all -m ping</code> отвечал pong без предупреждений. На HQ-CLI нужен sshd и пользователь.</p>
+<div class="block" id="m2t5-1" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: sshd и пользователь для Ansible"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">sshd и пользователь для Ansible</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> install <span class="o">-y</span> openssh-server python3
+<span class="k">id</span> sshuser <span class="op">&gt;/dev/null</span> 2&gt;&amp;1 <span class="op">||</span> <span class="k">useradd</span> <span class="o">-m</span> sshuser
+<span class="k">echo</span> <span class="s">&#x27;sshuser:<span class="v" data-k="PW">P@ssw0rd</span>&#x27;</span> <span class="op">|</span> <span class="k">chpasswd</span>
+<span class="k">systemctl</span> enable <span class="o">--now</span> sshd</code></pre></div><div class="block" id="m2t5-2" data-dev="HQ-SRV|HQ-RTR|BR-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Python на управляемых машинах"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-hq">HQ-RTR</span><span class="dev d-br">BR-RTR</span><span class="btitle">Python на управляемых машинах</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> install <span class="o">-y</span> python3</code></pre></div><div class="block" id="m2t5-3" data-dev="BR-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Ключи SSH"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Ключи SSH</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> install <span class="o">-y</span> ansible
+<span class="k">[</span> <span class="o">-f</span> /root/.ssh/id_ed25519 ] <span class="op">||</span> <span class="k">ssh-keygen</span> <span class="o">-t</span> ed25519 <span class="o">-N</span> <span class="s">&#x27;&#x27;</span> <span class="o">-f</span> /root/.ssh/id_ed25519
+<span class="k">ssh-copy-id</span> <span class="o">-o</span> StrictHostKeyChecking=accept-new <span class="o">-p</span> <span class="v" data-k="SSH_PORT">2027</span> sshuser@<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>
+<span class="k">ssh-copy-id</span> <span class="o">-o</span> StrictHostKeyChecking=accept-new sshuser@<span class="v" data-k="HQ_CLI_IP">10.0.200.30</span>
+<span class="k">ssh-copy-id</span> <span class="o">-o</span> StrictHostKeyChecking=accept-new net_admin@<span class="v" data-k="HQ_GW_MGMT_IP">10.0.99.1</span>
+<span class="k">ssh-copy-id</span> <span class="o">-o</span> StrictHostKeyChecking=accept-new net_admin@<span class="v" data-k="BR_GW_MGMT_IP">10.1.99.1</span></code></pre></div><div class="block" id="m2t5-4" data-dev="BR-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Инвентарь и конфигурация"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Инвентарь и конфигурация</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/ansible
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/ansible/hosts <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">[hq]</span>
+<span class="p">hq-srv</span> ansible_host=<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> ansible_port=<span class="v" data-k="SSH_PORT">2027</span> ansible_user=sshuser
+<span class="p">hq-cli</span> ansible_host=<span class="v" data-k="HQ_CLI_IP">10.0.200.30</span> ansible_user=sshuser
+<span class="p">hq-rtr</span> ansible_host=<span class="v" data-k="HQ_GW_MGMT_IP">10.0.99.1</span> ansible_user=net_admin
+
+<span class="p">[br]</span>
+<span class="p">br-rtr</span> ansible_host=<span class="v" data-k="BR_GW_MGMT_IP">10.1.99.1</span> ansible_user=net_admin
+<span class="h">EOF</span>
+<span class="k">cat</span> <span class="op">&gt;</span> /etc/ansible/ansible.cfg <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">[defaults]</span>
+<span class="p">inventory</span> = /etc/ansible/hosts
+<span class="p">host_key_checking</span> = False
+<span class="p">interpreter_python</span> = auto_silent
+<span class="h">EOF</span>
+<span class="k">cd</span> /etc/ansible <span class="op">&amp;&amp;</span> <span class="k">ansible</span> all <span class="o">-m</span> ping</code></pre></div>
+</section>
+<section class="step" id="m2t6" data-num="6" data-title="Веб-приложение в Docker">
+<div class="sh"><span class="snum">6</span><div><div class="exam">Задание 6</div><h3>Веб-приложение в Docker</h3></div></div>
+<p class="sd">Образы и compose.yaml берутся с Additional.iso. Проверьте в compose.yaml имена образов и публикацию порта <span class="v" data-k="APP_PORT">8080</span>.</p>
+<div class="block" id="m2t6-1" data-dev="BR-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Docker и стек testapp"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Docker и стек testapp</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> install <span class="o">-y</span> docker-engine docker-compose-v2
+<span class="k">systemctl</span> enable <span class="o">--now</span> docker
+<span class="k">mkdir</span> <span class="o">-p</span> /mnt/iso
+<span class="k">mountpoint</span> <span class="o">-q</span> /mnt/iso <span class="op">||</span> <span class="k">mount</span> <span class="v" data-k="ISO_DEV">/dev/sr0</span> /mnt/iso
+<span class="k">ls</span> /mnt/iso/docker
+<span class="k">for</span> f in /mnt/iso/docker/*.tar; <span class="k">do</span> <span class="k">docker</span> load <span class="o">-i</span> <span class="s">&quot;$f&quot;</span><span class="op">;</span> <span class="k">done</span>
+<span class="k">docker</span> images
+<span class="k">mkdir</span> <span class="o">-p</span> /root/testapp
+<span class="k">cp</span> /mnt/iso/docker/compose.yaml /root/testapp/
+<span class="k">cd</span> /root/testapp
+<span class="k">docker</span> compose up <span class="o">-d</span>
+<span class="k">docker</span> compose ps
+<span class="k">curl</span> <span class="o">-sI</span> http://127.0.0.1:<span class="v" data-k="APP_PORT">8080</span> <span class="op">|</span> <span class="k">head</span> <span class="o">-1</span></code></pre></div>
+</section>
+<section class="step" id="m2t7" data-num="7" data-title="Веб-приложение на Apache">
+<div class="sh"><span class="snum">7</span><div><div class="exam">Задание 7</div><h3>Веб-приложение на Apache</h3></div></div>
+<p class="sd">Apache + MariaDB на HQ-SRV, файлы и dump.sql — в каталоге web на Additional.iso.</p>
+<div class="block" id="m2t7-1" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: LAMP и база webdb"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">LAMP и база webdb</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> install <span class="o">-y</span> lamp-server
+<span class="k">mkdir</span> <span class="o">-p</span> /mnt/iso
+<span class="k">mountpoint</span> <span class="o">-q</span> /mnt/iso <span class="op">||</span> <span class="k">mount</span> <span class="v" data-k="ISO_DEV">/dev/sr0</span> /mnt/iso
+<span class="k">ls</span> /mnt/iso/web
+<span class="k">systemctl</span> enable <span class="o">--now</span> mariadb <span class="op">2&gt;/dev/null</span> <span class="op">||</span> <span class="k">systemctl</span> enable <span class="o">--now</span> mysqld
+<span class="k">mysql</span> <span class="o">-u</span> root <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="p">CREATE</span> DATABASE IF NOT EXISTS webdb;
+<span class="p">CREATE</span> USER IF NOT EXISTS &#x27;web&#x27;@&#x27;localhost&#x27; IDENTIFIED BY &#x27;<span class="v" data-k="PW">P@ssw0rd</span>&#x27;;
+<span class="p">GRANT</span> ALL PRIVILEGES ON webdb.* TO &#x27;web&#x27;@&#x27;localhost&#x27;;
+<span class="p">FLUSH</span> PRIVILEGES;
+<span class="h">EOF</span>
+<span class="k">mysql</span> <span class="o">-u</span> root webdb &lt; /mnt/iso/web/dump.sql
+<span class="k">mysql</span> <span class="o">-u</span> root <span class="o">-e</span> <span class="s">&#x27;SHOW TABLES&#x27;</span> webdb</code></pre></div><div class="block" id="m2t7-2" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Файлы сайта и запуск"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Файлы сайта и запуск</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">cp</span> /mnt/iso/web/index.php /mnt/iso/web/logo.png /var/www/html/
+<span class="k">rm</span> <span class="o">-f</span> /var/www/html/index.html
+<span class="c"># найдите строки подключения и укажите: localhost, web, <span class="v" data-k="PW">P@ssw0rd</span>, webdb</span>
+<span class="k">grep</span> <span class="o">-nE</span> <span class="s">&#x27;host|user|pass|db&#x27;</span> /var/www/html/index.php
+<span class="k">vim</span> /var/www/html/index.php
+<span class="k">systemctl</span> enable <span class="o">--now</span> httpd2
+<span class="k">systemctl</span> restart httpd2
+<span class="k">curl</span> <span class="o">-s</span> http://127.0.0.1:<span class="v" data-k="WEB_PORT">80</span> <span class="op">|</span> <span class="k">head</span> <span class="o">-20</span></code></pre></div>
+</section>
+<section class="step" id="m2t8" data-num="8" data-title="Статическая трансляция портов">
+<div class="sh"><span class="snum">8</span><div><div class="exam">Задание 8</div><h3>Статическая трансляция портов</h3></div></div>
+<p class="sd">Таблица nftables из задания 8 Модуля 1 дополняется цепочкой prerouting (DNAT). Файл перезаписывается целиком.</p>
+<div class="block" id="m2t8-1" data-dev="HQ-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: DNAT на HQ-SRV"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">DNAT на HQ-SRV</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">cat</span> <span class="op">&gt;</span> /etc/nftables/nftables.nft <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="c">#!/usr/sbin/nft -f</span>
+<span class="p">flush</span> ruleset
+
+<span class="p">table</span> ip nat {
+    <span class="p">chain</span> prerouting {
+        <span class="p">type</span> nat hook prerouting priority dstnat; policy accept;
+        <span class="p">iifname</span> &quot;<span class="v" data-k="HQ_WAN_IF">enp0s10</span>&quot; tcp dport <span class="v" data-k="EXT_PORT">8080</span> dnat to <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>:<span class="v" data-k="WEB_PORT">80</span>
+        <span class="p">iifname</span> &quot;<span class="v" data-k="HQ_WAN_IF">enp0s10</span>&quot; tcp dport <span class="v" data-k="SSH_PORT">2027</span> dnat to <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>:<span class="v" data-k="SSH_PORT">2027</span>
+    <span class="p">}</span>
+
+    <span class="p">chain</span> postrouting {
+        <span class="p">type</span> nat hook postrouting priority srcnat; policy accept;
+        <span class="p">oifname</span> &quot;<span class="v" data-k="HQ_WAN_IF">enp0s10</span>&quot; masquerade
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="h">EOF</span>
+<span class="k">systemctl</span> enable <span class="o">--now</span> nftables
+<span class="k">systemctl</span> restart nftables
+<span class="k">nft</span> list ruleset</code></pre></div><div class="block" id="m2t8-2" data-dev="BR-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: DNAT на BR-SRV"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-RTR</span><span class="btitle">DNAT на BR-SRV</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">cat</span> <span class="op">&gt;</span> /etc/nftables/nftables.nft <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="c">#!/usr/sbin/nft -f</span>
+<span class="p">flush</span> ruleset
+
+<span class="p">table</span> ip nat {
+    <span class="p">chain</span> prerouting {
+        <span class="p">type</span> nat hook prerouting priority dstnat; policy accept;
+        <span class="p">iifname</span> &quot;<span class="v" data-k="BR_WAN_IF">enp0s9</span>&quot; tcp dport <span class="v" data-k="EXT_PORT">8080</span> dnat to <span class="v" data-k="BR_SRV_IP">10.1.100.10</span>:<span class="v" data-k="APP_PORT">8080</span>
+        <span class="p">iifname</span> &quot;<span class="v" data-k="BR_WAN_IF">enp0s9</span>&quot; tcp dport <span class="v" data-k="SSH_PORT">2027</span> dnat to <span class="v" data-k="BR_SRV_IP">10.1.100.10</span>:<span class="v" data-k="SSH_PORT">2027</span>
+    <span class="p">}</span>
+
+    <span class="p">chain</span> postrouting {
+        <span class="p">type</span> nat hook postrouting priority srcnat; policy accept;
+        <span class="p">oifname</span> &quot;<span class="v" data-k="BR_WAN_IF">enp0s9</span>&quot; masquerade
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="h">EOF</span>
+<span class="k">systemctl</span> enable <span class="o">--now</span> nftables
+<span class="k">systemctl</span> restart nftables
+<span class="k">nft</span> list ruleset</code></pre></div><div class="block chk" id="m2t8-3" data-dev="ISP" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка извне"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">Проверка извне</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">curl</span> <span class="o">-sI</span> http://<span class="v" data-k="HQ_WAN_IP">172.16.1.2</span>:<span class="v" data-k="EXT_PORT">8080</span> <span class="op">|</span> <span class="k">head</span> <span class="o">-1</span>
+<span class="k">curl</span> <span class="o">-sI</span> http://<span class="v" data-k="BR_WAN_IP">172.16.2.2</span>:<span class="v" data-k="EXT_PORT">8080</span> <span class="op">|</span> <span class="k">head</span> <span class="o">-1</span>
+<span class="k">ssh</span> <span class="o">-p</span> <span class="v" data-k="SSH_PORT">2027</span> sshuser@<span class="v" data-k="HQ_WAN_IP">172.16.1.2</span>
+<span class="k">ssh</span> <span class="o">-p</span> <span class="v" data-k="SSH_PORT">2027</span> sshuser@<span class="v" data-k="BR_WAN_IP">172.16.2.2</span></code></pre></div>
+</section>
+<section class="step" id="m2t9" data-num="9" data-title="Яндекс Браузер на HQ-CLI">
+<div class="sh"><span class="snum">9</span><div><div class="exam">Задание 9</div><h3>Яндекс Браузер на HQ-CLI</h3></div></div>
+<p class="sd">Пакет есть в репозитории ALT; другой вариант — «Центр приложений».</p>
+<div class="block" id="m2t9-1" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Установка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Установка</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code><span class="k">apt-get</span> update <span class="op">&amp;&amp;</span> <span class="k">apt-get</span> install <span class="o">-y</span> yandex-browser-stable
+<span class="k">yandex-browser-stable</span> <span class="o">--version</span></code></pre></div>
+</section>
+<footer>
+<p>Стенд: Панков С. А., НовГУ · Порядок по КИМ 09.02.06-1-2027, Том 1 · ALT Linux (etcnet)</p>
+<p class="noprint"><button type="button" class="linkbtn" onclick="window.print()">Версия для печати</button></p>
+</footer>
+</main>
+</div>
+<a class="top" href="#" aria-label="Наверх">↑</a>
+<dialog class="params" id="params" aria-labelledby="ptitle">
+<form method="dialog" class="pform" novalidate>
+<div class="phead"><h2 id="ptitle">Параметры сети</h2><button type="button" class="x" data-close aria-label="Закрыть">×</button></div>
+<p class="pnote">Измените значения и нажмите «Пересобрать команды» — подставятся во все блоки, таблицы и схему. Параметры общие для обоих модулей.</p>
+<div class="pbody" data-pbody></div>
+<div class="pmsg" data-pmsg aria-live="polite"></div>
+<div class="pfoot">
+<button type="button" class="primary" data-apply>Пересобрать команды</button>
+<button type="button" data-preset>Маски по КИМ</button>
+<button type="button" data-defaults>Значения стенда</button>
+<button type="button" data-export>Экспорт</button>
+<label class="filebtn">Импорт<input type="file" accept=".json,application/json" data-import hidden></label>
+</div>
+</form>
+</dialog>
+<div class="toast" data-toast role="status" aria-live="polite"></div>
+<script src="assets/params.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
