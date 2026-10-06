@@ -17,26 +17,4 @@
 - Подсветка синтаксиса и подставляемых значений, сворачивание длинных блоков.
 - Версия для печати (Ctrl+P), вертикальная схема на телефоне.
 
-## Публикация на GitHub Pages
-
-1. Загрузите **содержимое** этой папки в корень репозитория (вместе с `assets/` и `.nojekyll`).
-2. Settings → Pages → Deploy from a branch → `main` / `(root)`.
-3. Страница откроется по адресу `https://<логин>.github.io/<репозиторий>/`.
-4. Для превью ссылок (Telegram, VK) замените в `index.html` и `module2.html`
-   `https://USERNAME.github.io/REPO/` на реальный адрес:
-
-   ```bash
-   sed -i 's#https://USERNAME.github.io/REPO/#https://<логин>.github.io/<репозиторий>/#g' index.html module2.html
-   ```
-
-## Структура
-
-```
-index.html, module2.html
-assets/style.css   — оформление (тёмная тема, печать)
-assets/params.js   — схема параметров, проверка и вычисление производных значений
-assets/app.js      — интерфейс: параметры, копирование, отметки, фильтр, поиск
-assets/logo.webp, favicon.png, og-image.png
-```
-
 Стенд: Панков С. А., НовГУ.
