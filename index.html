@@ -122,11 +122,11 @@
 <text x="760" y="362" class="sm">lab-core-br</text>
 <rect x="670" y="428" width="160" height="70" rx="8" class="bx b-br"/>
 <text x="750" y="452" text-anchor="middle" class="nm">BR-SRV</text>
-<text x="750" y="470" text-anchor="middle" class="mn">VLAN <tspan class="v" data-k="V_SRV">100</tspan> · <tspan class="v" data-k="BR_SRV_IP_DOT">.10</tspan></text>
+<text x="750" y="470" text-anchor="middle" class="mn">VLAN <tspan class="v" data-k="V_SRV">100</tspan> · <tspan class="v" data-k="BR_SRV_IP_DOT">.20</tspan></text>
 <text x="750" y="487" text-anchor="middle" class="sm">SSH <tspan class="v" data-k="SSH_PORT">2027</tspan></text>
 <text x="408" y="424" class="mn">HQ: <tspan class="v" data-k="HQ_GW_SRV_SUBNET">10.0.100.0/24</tspan> · <tspan class="v" data-k="HQ_GW_CLI_SUBNET">10.0.200.0/24</tspan></text>
 <text x="408" y="442" class="mn">VLAN <tspan class="v" data-k="V_MGMT">999</tspan>: <tspan class="v" data-k="HQ_GW_MGMT_SUBNET">10.0.99.0/24</tspan></text>
-<text x="408" y="468" class="mn">BR: <tspan class="v" data-k="BR_GW_SRV_SUBNET">10.1.100.0/28</tspan> · <tspan class="v" data-k="BR_GW_MGMT_SUBNET">10.1.99.0/28</tspan></text>
+<text x="408" y="468" class="mn">BR: <tspan class="v" data-k="BR_GW_SRV_SUBNET">10.1.100.16/28</tspan> · <tspan class="v" data-k="BR_GW_MGMT_SUBNET">10.1.99.0/28</tspan></text>
 </svg>
 <svg class="topo-narrow" viewBox="0 0 360 600" role="img" aria-label="Схема сети (вертикальная)" font-family="-apple-system,Segoe UI,Roboto,Arial,sans-serif">
 <rect x="105" y="8" width="150" height="30" rx="15" class="pill-s"/>
@@ -170,11 +170,11 @@
 <text x="90" y="504" text-anchor="middle" class="sm">DHCP-клиент</text>
 <rect x="190" y="370" width="160" height="62" rx="8" class="bx b-br"/>
 <text x="270" y="392" text-anchor="middle" class="nm">BR-SRV</text>
-<text x="270" y="409" text-anchor="middle" class="mn">VLAN <tspan class="v" data-k="V_SRV">100</tspan> · <tspan class="v" data-k="BR_SRV_IP_DOT">.10</tspan></text>
+<text x="270" y="409" text-anchor="middle" class="mn">VLAN <tspan class="v" data-k="V_SRV">100</tspan> · <tspan class="v" data-k="BR_SRV_IP_DOT">.20</tspan></text>
 <text x="270" y="424" text-anchor="middle" class="sm">SSH <tspan class="v" data-k="SSH_PORT">2027</tspan></text>
 <text x="10" y="548" class="mn">HQ: <tspan class="v" data-k="HQ_GW_SRV_SUBNET">10.0.100.0/24</tspan> · <tspan class="v" data-k="HQ_GW_CLI_SUBNET">10.0.200.0/24</tspan></text>
 <text x="10" y="566" class="mn">VLAN <tspan class="v" data-k="V_MGMT">999</tspan>: <tspan class="v" data-k="HQ_GW_MGMT_SUBNET">10.0.99.0/24</tspan></text>
-<text x="10" y="590" class="mn">BR: <tspan class="v" data-k="BR_GW_SRV_SUBNET">10.1.100.0/28</tspan> · <tspan class="v" data-k="BR_GW_MGMT_SUBNET">10.1.99.0/28</tspan></text>
+<text x="10" y="590" class="mn">BR: <tspan class="v" data-k="BR_GW_SRV_SUBNET">10.1.100.16/28</tspan> · <tspan class="v" data-k="BR_GW_MGMT_SUBNET">10.1.99.0/28</tspan></text>
 </svg>
 </div>
 
@@ -208,10 +208,10 @@
 <tr class="grp"><td colspan="5">Офис BR</td></tr>
 <tr><td><span class="dev d-br">BR-RTR</span></td><td class="m"><span class="v" data-k="BR_WAN_IF">enp0s9</span></td><td class="m"><span class="v" data-k="BR_WAN_CIDR">172.16.2.2/28</span></td><td class="m"><span class="v" data-k="ISP_BR_IP">172.16.2.1</span></td><td><code>lab-isp-br</code> → ISP</td></tr>
 <tr><td></td><td class="m"><span class="v" data-k="BR_LAN_IF">enp0s10</span></td><td class="m">—</td><td class="m">—</td><td><code>lab-core-br</code>, trunk <span class="v" data-k="V_SRV">100</span>/<span class="v" data-k="V_MGMT">999</span></td></tr>
-<tr><td></td><td class="m"><span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_SRV">100</span></td><td class="m"><span class="v" data-k="BR_GW_SRV">10.1.100.1/28</span></td><td class="m">—</td><td>VLAN <span class="v" data-k="V_SRV">100</span> — серверы</td></tr>
+<tr><td></td><td class="m"><span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_SRV">100</span></td><td class="m"><span class="v" data-k="BR_GW_SRV">10.1.100.17/28</span></td><td class="m">—</td><td>VLAN <span class="v" data-k="V_SRV">100</span> — серверы</td></tr>
 <tr><td></td><td class="m"><span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_MGMT">999</span></td><td class="m"><span class="v" data-k="BR_GW_MGMT">10.1.99.1/28</span></td><td class="m">—</td><td>VLAN <span class="v" data-k="V_MGMT">999</span> — управление</td></tr>
 <tr><td></td><td class="m">gre1</td><td class="m"><span class="v" data-k="GRE_BR_CIDR">10.10.10.2/30</span></td><td class="m">—</td><td>Туннель к HQ-RTR</td></tr>
-<tr><td><span class="dev d-br">BR-SRV</span></td><td class="m"><span class="v" data-k="BR_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span></td><td class="m"><span class="v" data-k="BR_SRV_CIDR">10.1.100.10/28</span></td><td class="m"><span class="v" data-k="BR_GW_SRV_IP">10.1.100.1</span></td><td><code>lab-core-br</code>, VLAN <span class="v" data-k="V_SRV">100</span></td></tr>
+<tr><td><span class="dev d-br">BR-SRV</span></td><td class="m"><span class="v" data-k="BR_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span></td><td class="m"><span class="v" data-k="BR_SRV_CIDR">10.1.100.20/28</span></td><td class="m"><span class="v" data-k="BR_GW_SRV_IP">10.1.100.17</span></td><td><code>lab-core-br</code>, VLAN <span class="v" data-k="V_SRV">100</span></td></tr>
 <tr class="grp"><td colspan="5">Управление (<span class="v" data-k="MG_IF">enp0s8</span>, Host-Only)</td></tr>
 <tr><td colspan="5" class="m wrap">HQ-RTR <span class="v" data-k="MG_HQRTR_CIDR">192.168.56.10/24</span> · HQ-SRV <span class="v" data-k="MG_HQSRV_CIDR">192.168.56.20/24</span> · HQ-CLI <span class="v" data-k="MG_HQCLI_CIDR">192.168.56.30/24</span> · ISP <span class="v" data-k="MG_ISP_CIDR">192.168.56.40/24</span> · BR-RTR <span class="v" data-k="MG_BRRTR_CIDR">192.168.56.50/24</span> · BR-SRV <span class="v" data-k="MG_BRSRV_CIDR">192.168.56.60/24</span></td></tr>
 </table></div>
@@ -219,7 +219,7 @@
 <h4 id="vlan">VLAN и подсети</h4>
 <div class="tw"><table>
 <tr><th>VLAN</th><th>Назначение</th><th>HQ</th><th>BR</th></tr>
-<tr><td class="m"><span class="v" data-k="V_SRV">100</span></td><td>Серверы</td><td class="m"><span class="v" data-k="HQ_GW_SRV_SUBNET">10.0.100.0/24</span></td><td class="m"><span class="v" data-k="BR_GW_SRV_SUBNET">10.1.100.0/28</span></td></tr>
+<tr><td class="m"><span class="v" data-k="V_SRV">100</span></td><td>Серверы</td><td class="m"><span class="v" data-k="HQ_GW_SRV_SUBNET">10.0.100.0/24</span></td><td class="m"><span class="v" data-k="BR_GW_SRV_SUBNET">10.1.100.16/28</span></td></tr>
 <tr><td class="m"><span class="v" data-k="V_CLI">200</span></td><td>Клиенты</td><td class="m"><span class="v" data-k="HQ_GW_CLI_SUBNET">10.0.200.0/24</span></td><td class="m">—</td></tr>
 <tr><td class="m"><span class="v" data-k="V_MGMT">999</span></td><td>Управление</td><td class="m"><span class="v" data-k="HQ_GW_MGMT_SUBNET">10.0.99.0/24</span></td><td class="m"><span class="v" data-k="BR_GW_MGMT_SUBNET">10.1.99.0/28</span></td></tr>
 <tr><td class="m">—</td><td>GRE-туннель</td><td class="m" colspan="2"><span class="v" data-k="GRE_HQ_SUBNET">10.10.10.0/30</span> (HQ <span class="v" data-k="GRE_HQ_DOT">.1</span> · BR <span class="v" data-k="GRE_BR_DOT">.2</span>)</td></tr>
@@ -250,7 +250,7 @@
 <tr><td class="m">br-fw.<span class="v" data-k="DOMAIN">au-team.irpo</span></td><td>A</td><td class="m"><span class="v" data-k="BR_FW_IP">10.1.99.2</span></td><td>BR-FW (нет на стенде)</td></tr>
 <tr><td class="m"><span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span></td><td>A, PTR</td><td class="m"><span class="v" data-k="HQ_SRV_IP">10.0.100.20</span></td><td>HQ-SRV</td></tr>
 <tr><td class="m"><span class="v" data-k="H_HQCLI">hq-cli.au-team.irpo</span></td><td>A</td><td class="m"><span class="v" data-k="HQ_CLI_IP">10.0.200.30</span></td><td>HQ-CLI</td></tr>
-<tr><td class="m"><span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span></td><td>A, PTR</td><td class="m"><span class="v" data-k="BR_SRV_IP">10.1.100.10</span></td><td>BR-SRV</td></tr>
+<tr><td class="m"><span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span></td><td>A, PTR</td><td class="m"><span class="v" data-k="BR_SRV_IP">10.1.100.20</span></td><td>BR-SRV</td></tr>
 <tr><td class="m">docker.<span class="v" data-k="DOMAIN">au-team.irpo</span></td><td>A</td><td class="m"><span class="v" data-k="ISP_HQ_IP">172.16.1.1</span></td><td>ISP (к HQ-RTR)</td></tr>
 <tr><td class="m">web.<span class="v" data-k="DOMAIN">au-team.irpo</span></td><td>A</td><td class="m"><span class="v" data-k="ISP_BR_IP">172.16.2.1</span></td><td>ISP (к BR-RTR)</td></tr>
 </table></div>
@@ -377,7 +377,7 @@
 <span class="p">DISABLED</span>=<span class="s">no</span>
 <span class="p">CONFIG_IPV4</span>=<span class="s">yes</span>
 <span class="h">EOF</span>
-<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="BR_GW_SRV">10.1.100.1/28</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_SRV">100</span>/ipv4address
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="BR_GW_SRV">10.1.100.17/28</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_SRV">100</span>/ipv4address
 <span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="BR_GW_MGMT">10.1.99.1/28</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_MGMT">999</span>/ipv4address
 
 <span class="c"># IP-форвардинг</span>
@@ -401,8 +401,8 @@
 <span class="p">DISABLED</span>=<span class="s">no</span>
 <span class="p">CONFIG_IPV4</span>=<span class="s">yes</span>
 <span class="h">EOF</span>
-<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="BR_SRV_CIDR">10.1.100.10/28</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/ipv4address
-<span class="k">echo</span> <span class="s">&#x27;default via <span class="v" data-k="BR_GW_SRV_IP">10.1.100.1</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/ipv4route
+<span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="BR_SRV_CIDR">10.1.100.20/28</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/ipv4address
+<span class="k">echo</span> <span class="s">&#x27;default via <span class="v" data-k="BR_GW_SRV_IP">10.1.100.17</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="BR_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/ipv4route
 <span class="k">systemctl</span> restart network; <span class="k">exec</span> bash
 <span class="k">ip</span> <span class="o">-br</span> a</code></pre></div><div class="block" id="t1-5" data-dev="HQ-SRV" data-kind="cmd">
 <div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Имя"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Имя</span></div><button class="copy" type="button">Копировать</button></div>
@@ -452,17 +452,17 @@
 <p class="sd">sshuser на серверах, net_admin на маршрутизаторах, sudo без пароля.</p>
 <div class="block" id="t3-1" data-dev="HQ-SRV|BR-SRV" data-kind="cmd">
 <div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пользователь sshuser"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-br">BR-SRV</span><span class="btitle">Пользователь sshuser</span></div><button class="copy" type="button">Копировать</button></div>
-<pre><code><span class="k">useradd</span> <span class="o">-m</span> <span class="o">-u</span> <span class="v" data-k="SSH_UID">2027</span> sshuser
+<pre><code><span class="k">id</span> sshuser <span class="op">&gt;/dev/null</span> 2&gt;&amp;1 <span class="op">||</span> <span class="k">useradd</span> <span class="o">-m</span> <span class="o">-u</span> <span class="v" data-k="SSH_UID">2027</span> sshuser
 <span class="k">echo</span> <span class="s">&#x27;sshuser:<span class="v" data-k="PW">P@ssw0rd</span>&#x27;</span> <span class="op">|</span> <span class="k">chpasswd</span>
 <span class="k">usermod</span> <span class="o">-aG</span> wheel sshuser
-<span class="k">echo</span> <span class="s">&#x27;sshuser ALL=(ALL:ALL) NOPASSWD: ALL&#x27;</span> <span class="op">&gt;&gt;</span> /etc/sudoers
+<span class="k">grep</span> <span class="o">-q</span> <span class="s">&#x27;^sshuser &#x27;</span> /etc/sudoers <span class="op">||</span> <span class="k">echo</span> <span class="s">&#x27;sshuser ALL=(ALL:ALL) NOPASSWD: ALL&#x27;</span> <span class="op">&gt;&gt;</span> /etc/sudoers
 <span class="k">visudo</span> <span class="o">-c</span>
 <span class="k">id</span> sshuser</code></pre></div><div class="block" id="t3-2" data-dev="HQ-RTR|BR-RTR" data-kind="cmd">
 <div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пользователь net_admin"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="dev d-br">BR-RTR</span><span class="btitle">Пользователь net_admin</span></div><button class="copy" type="button">Копировать</button></div>
-<pre><code><span class="k">useradd</span> <span class="o">-m</span> net_admin
+<pre><code><span class="k">id</span> net_admin <span class="op">&gt;/dev/null</span> 2&gt;&amp;1 <span class="op">||</span> <span class="k">useradd</span> <span class="o">-m</span> net_admin
 <span class="k">echo</span> <span class="s">&#x27;net_admin:<span class="v" data-k="PW">P@ssw0rd</span>&#x27;</span> <span class="op">|</span> <span class="k">chpasswd</span>
 <span class="k">usermod</span> <span class="o">-aG</span> wheel net_admin
-<span class="k">echo</span> <span class="s">&#x27;net_admin ALL=(ALL:ALL) NOPASSWD: ALL&#x27;</span> <span class="op">&gt;&gt;</span> /etc/sudoers
+<span class="k">grep</span> <span class="o">-q</span> <span class="s">&#x27;^net_admin &#x27;</span> /etc/sudoers <span class="op">||</span> <span class="k">echo</span> <span class="s">&#x27;net_admin ALL=(ALL:ALL) NOPASSWD: ALL&#x27;</span> <span class="op">&gt;&gt;</span> /etc/sudoers
 <span class="k">visudo</span> <span class="o">-c</span>
 <span class="k">id</span> net_admin</code></pre></div>
 </section>
@@ -557,14 +557,14 @@
   <span class="o">-e</span> <span class="s">&#x27;s/^#?MaxAuthTries .*/MaxAuthTries 2/&#x27;</span> \
   <span class="o">-e</span> <span class="s">&#x27;s|^#?Banner .*|Banner /etc/openssh/banner|&#x27;</span> \
   /etc/openssh/sshd_config
-<span class="k">echo</span> <span class="s">&#x27;AllowUsers sshuser&#x27;</span> <span class="op">&gt;&gt;</span> /etc/openssh/sshd_config
+<span class="k">grep</span> <span class="o">-q</span> <span class="s">&#x27;^AllowUsers&#x27;</span> /etc/openssh/sshd_config <span class="op">||</span> <span class="k">echo</span> <span class="s">&#x27;AllowUsers sshuser&#x27;</span> <span class="op">&gt;&gt;</span> /etc/openssh/sshd_config
 
 <span class="k">systemctl</span> enable sshd
 <span class="k">systemctl</span> restart sshd
 <span class="k">grep</span> <span class="o">-E</span> <span class="s">&#x27;^(Port|MaxAuthTries|Banner|AllowUsers)&#x27;</span> /etc/openssh/sshd_config</code></pre></div><div class="block chk" id="t5-2" data-dev="HQ-CLI" data-kind="check">
 <div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">ssh</span> <span class="o">-p</span> <span class="v" data-k="SSH_PORT">2027</span> sshuser@<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>
-<span class="k">ssh</span> <span class="o">-p</span> <span class="v" data-k="SSH_PORT">2027</span> sshuser@<span class="v" data-k="BR_SRV_IP">10.1.100.10</span>   <span class="c"># после заданий 6–7</span></code></pre></div>
+<span class="k">ssh</span> <span class="o">-p</span> <span class="v" data-k="SSH_PORT">2027</span> sshuser@<span class="v" data-k="BR_SRV_IP">10.1.100.20</span>   <span class="c"># после заданий 6–7</span></code></pre></div>
 </section>
 <section class="step" id="t6" data-num="6" data-title="IP-туннель GRE">
 <div class="sh"><span class="snum">6</span><div><div class="exam">Задание 1 · пункт 6</div><h3>IP-туннель GRE</h3></div></div>
@@ -605,7 +605,7 @@
 <span class="k">systemctl</span> restart network
 <span class="k">ip</span> <span class="o">-br</span> a show gre1</code></pre></div><div class="block chk" id="t6-3" data-dev="HQ-RTR" data-kind="check">
 <div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
-<pre><code><span class="k">ping</span> <span class="o">-c3</span> <span class="v" data-k="GRE_BR">10.10.10.2</span></code></pre></div>
+<pre><code><span class="k">ping</span> <span class="o">-c3</span> <span class="v" data-k="GRE_BR">10.10.10.2</span></code></pre><div class="exp"><span class="expl">Ожидается</span><div class="expt">3 packets transmitted, 3 received, 0% packet loss</div></div></div>
 </section>
 <section class="step" id="t7" data-num="7" data-title="Динамическая маршрутизация OSPF">
 <div class="sh"><span class="snum">7</span><div><div class="exam">Задание 1 · пункт 7</div><h3>Динамическая маршрутизация OSPF</h3></div></div>
@@ -658,7 +658,7 @@
 <span class="p">router</span> ospf
  <span class="p">ospf</span> router-id <span class="v" data-k="GRE_BR">10.10.10.2</span>
  <span class="p">passive-interface</span> default
- <span class="p">network</span> <span class="v" data-k="BR_GW_SRV_SUBNET">10.1.100.0/28</span> area 0
+ <span class="p">network</span> <span class="v" data-k="BR_GW_SRV_SUBNET">10.1.100.16/28</span> area 0
  <span class="p">network</span> <span class="v" data-k="BR_GW_MGMT_SUBNET">10.1.99.0/28</span> area 0
  <span class="p">network</span> <span class="v" data-k="GRE_HQ_SUBNET">10.10.10.0/30</span> area 0
 <span class="p">exit</span>
@@ -670,7 +670,7 @@
 <span class="k">systemctl</span> restart frr</code></pre></div><div class="block chk" id="t7-3" data-dev="HQ-RTR|BR-RTR" data-kind="check">
 <div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка: сосед в состоянии Full"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="dev d-br">BR-RTR</span><span class="btitle">Проверка: сосед в состоянии Full</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">vtysh</span> <span class="o">-c</span> <span class="s">&#x27;show ip ospf neighbor&#x27;</span>
-<span class="k">vtysh</span> <span class="o">-c</span> <span class="s">&#x27;show ip route ospf&#x27;</span></code></pre></div>
+<span class="k">vtysh</span> <span class="o">-c</span> <span class="s">&#x27;show ip route ospf&#x27;</span></code></pre><div class="exp"><span class="expl">Ожидается</span><div class="expt">сосед в состоянии Full/-, интерфейс gre1; маршруты O&gt;* до сетей другого офиса</div></div></div>
 </section>
 <section class="step" id="t8" data-num="8" data-title="Динамическая трансляция адресов (NAT)">
 <div class="sh"><span class="snum">8</span><div><div class="exam">Задание 1 · пункт 8</div><h3>Динамическая трансляция адресов (NAT)</h3></div></div>
@@ -707,7 +707,7 @@
 <span class="k">systemctl</span> restart nftables
 <span class="k">nft</span> list ruleset</code></pre></div><div class="block chk" id="t8-3" data-dev="HQ-SRV|BR-SRV" data-kind="check">
 <div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-br">BR-SRV</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
-<pre><code><span class="k">ping</span> <span class="o">-c3</span> 77.88.8.8</code></pre></div>
+<pre><code><span class="k">ping</span> <span class="o">-c3</span> 77.88.8.8</code></pre><div class="exp"><span class="expl">Ожидается</span><div class="expt">0% packet loss</div></div></div>
 </section>
 <section class="step" id="t9" data-num="9" data-title="DHCP для HQ-CLI">
 <div class="sh"><span class="snum">9</span><div><div class="exam">Задание 1 · пункт 9</div><h3>DHCP для HQ-CLI</h3></div></div>
@@ -780,7 +780,7 @@
 <span class="p">};</span>
 <span class="h">EOF</span>
 
-<span class="k">cat</span> <span class="op">&gt;&gt;</span> /etc/bind/local.conf <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
+<span class="k">grep</span> <span class="o">-q</span> <span class="s">&#x27;&quot;<span class="v" data-k="DOMAIN">au-team.irpo</span>&quot;&#x27;</span> /etc/bind/local.conf <span class="op">||</span> <span class="k">cat</span> <span class="op">&gt;&gt;</span> /etc/bind/local.conf <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
 <span class="p">zone</span> &quot;<span class="v" data-k="DOMAIN">au-team.irpo</span>&quot; {
     <span class="p">type</span> master;
     <span class="p">file</span> &quot;/zone/<span class="v" data-k="DOMAIN">au-team.irpo</span>.zone&quot;;
@@ -811,7 +811,7 @@
 <span class="p">br-fw</span>   IN A    <span class="v" data-k="BR_FW_IP">10.1.99.2</span>
 <span class="p">hq-srv</span>  IN A    <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>
 <span class="p">hq-cli</span>  IN A    <span class="v" data-k="HQ_CLI_IP">10.0.200.30</span>
-<span class="p">br-srv</span>  IN A    <span class="v" data-k="BR_SRV_IP">10.1.100.10</span>
+<span class="p">br-srv</span>  IN A    <span class="v" data-k="BR_SRV_IP">10.1.100.20</span>
 <span class="p">docker</span>  IN A    <span class="v" data-k="ISP_HQ_IP">172.16.1.1</span>
 <span class="p">web</span>     IN A    <span class="v" data-k="ISP_BR_IP">172.16.2.1</span>
 <span class="h">EOF</span>
@@ -827,7 +827,7 @@
 <span class="p">$TTL</span> 1D
 <span class="p">@</span>   IN SOA <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>. root.<span class="v" data-k="DOMAIN">au-team.irpo</span>. ( 2027010101 12H 1H 1W 1H )
     <span class="p">IN</span> NS  <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>.
-<span class="p"><span class="v" data-k="REV_BR_PTR">10</span></span>  IN PTR <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>.
+<span class="p"><span class="v" data-k="REV_BR_PTR">20</span></span>  IN PTR <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>.
 <span class="h">EOF</span>
 
 <span class="k">chown</span> named:named /var/lib/bind/zone/*
@@ -847,8 +847,8 @@
 <pre><code><span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> <span class="v" data-k="H_HQRTR">hq-rtr.au-team.irpo</span> +short
 <span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span> +short
 <span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> <span class="o">-x</span> <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> +short
-<span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> <span class="o">-x</span> <span class="v" data-k="BR_SRV_IP">10.1.100.10</span> +short
-<span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> ya.ru +short</code></pre></div>
+<span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> <span class="o">-x</span> <span class="v" data-k="BR_SRV_IP">10.1.100.20</span> +short
+<span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> ya.ru +short</code></pre><div class="exp"><span class="expl">Ожидается</span><div class="expt"><span class="v" data-k="HQ_GW_MGMT_IP">10.0.99.1</span>, <span class="v" data-k="BR_SRV_IP">10.1.100.20</span>, <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>., <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span>., адреса ya.ru</div></div></div>
 </section>
 <section class="step" id="t11" data-num="11" data-title="Часовой пояс">
 <div class="sh"><span class="snum">11</span><div><div class="exam">Задание 1 · пункт 11</div><h3>Часовой пояс</h3></div></div>
@@ -867,7 +867,7 @@
 <span class="k">ip</span> route
 <span class="k">ping</span> <span class="o">-c2</span> <span class="v" data-k="HQ_GW_CLI_IP">10.0.200.1</span>
 <span class="k">ping</span> <span class="o">-c2</span> <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>
-<span class="k">ping</span> <span class="o">-c2</span> <span class="v" data-k="BR_SRV_IP">10.1.100.10</span>
+<span class="k">ping</span> <span class="o">-c2</span> <span class="v" data-k="BR_SRV_IP">10.1.100.20</span>
 <span class="k">ping</span> <span class="o">-c2</span> 77.88.8.8
 <span class="k">host</span> <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>
 <span class="k">host</span> ya.ru

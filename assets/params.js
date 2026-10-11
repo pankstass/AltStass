@@ -45,11 +45,11 @@
       ["BR_WAN_IF", "BR-RTR: интерфейс к ISP", "enp0s9", "if"],
       ["BR_WAN_IP", "BR-RTR: адрес к ISP", "172.16.2.2", "ip"],
       ["BR_LAN_IF", "BR-RTR: trunk-интерфейс", "enp0s10", "if"],
-      ["BR_GW_SRV", "BR-RTR: шлюз VLAN серверов", "10.1.100.1/28", "cidr"],
+      ["BR_GW_SRV", "BR-RTR: шлюз VLAN серверов", "10.1.100.17/28", "cidr"],
       ["BR_GW_MGMT", "BR-RTR: шлюз VLAN управления", "10.1.99.1/28", "cidr"],
       ["GRE_BR", "BR-RTR: адрес gre1", "10.10.10.2", "ip"],
       ["BR_SRV_IF", "BR-SRV: интерфейс", "enp0s9", "if"],
-      ["BR_SRV_IP", "BR-SRV: адрес", "10.1.100.10", "ip"],
+      ["BR_SRV_IP", "BR-SRV: адрес", "10.1.100.20", "ip"],
       ["BR_FW_IP", "BR-FW: адрес (для DNS)", "10.1.99.2", "ip"]
     ]},
     { id: "mgmt", title: "Сеть управления (Host-Only)", fields: [
@@ -66,8 +66,11 @@
       ["RAID_D1", "HQ-SRV: диск 1 для RAID", "/dev/sdb", "path"],
       ["RAID_D2", "HQ-SRV: диск 2 для RAID", "/dev/sdc", "path"],
       ["ISO_DEV", "Привод с Additional.iso", "/dev/sr0", "path"],
+      ["ISO_DIR", "Каталог с файлами Additional.iso", "/opt/additional", "path"],
       ["NTP_UP", "Вышестоящий NTP для ISP", "ntp1.vniiftri.ru", "host"],
       ["HQ_USERS", "Число пользователей hquser", "5", "int"],
+      ["HQ_USER_PW", "Пароль hquserN (к нему дописывается N)", "Passw0rd!", "text"],
+      ["ANS_PORT", "Порт SSH HQ-CLI и маршрутизаторов (Ansible)", "2027", "port"],
       ["APP_PORT", "Порт testapp на BR-SRV", "8080", "port"],
       ["WEB_PORT", "Порт apache на HQ-SRV", "80", "port"],
       ["EXT_PORT", "Внешний порт веб-приложений", "8080", "port"]
@@ -155,7 +158,7 @@
     HQ_GW_SRV: "10.0.100.1/27", HQ_SRV_IP: "10.0.100.20",
     HQ_GW_CLI: "10.0.200.1/28", HQ_CLI_IP: "10.0.200.14",
     DHCP_FROM: "10.0.200.2", DHCP_TO: "10.0.200.13",
-    HQ_GW_MGMT: "10.0.99.1/29", BR_GW_SRV: "10.1.100.1/28", BR_SRV_IP: "10.1.100.10",
+    HQ_GW_MGMT: "10.0.99.1/29", BR_GW_SRV: "10.1.100.17/28", BR_SRV_IP: "10.1.100.20",
     BR_GW_MGMT: "10.1.99.1/29", BR_FW_IP: "10.1.99.2", GRE_HQ: "10.10.10.1/30", GRE_BR: "10.10.10.2"
   };
 

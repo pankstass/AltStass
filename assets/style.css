@@ -207,3 +207,9 @@ footer p{margin:0 0 6px}
 }
 .devact[hidden],[hidden]{display:none!important}
 .filebtn{font-size:13px!important;line-height:1}
+/* v1.3: отметка «проверено на стенде» и ожидаемый вывод */
+.vbadge{font-size:11px;font-weight:700;color:#7ee2b8;border:1px solid rgba(126,226,184,.45);border-radius:4px;padding:1px 6px;margin-left:4px;white-space:nowrap}
+.exp{display:flex;gap:10px;align-items:flex-start;border-top:1px dashed var(--bd);padding:8px 16px;font:12px/1.55 var(--mono);color:var(--t2)}
+.expl{flex:0 0 auto;font:700 11px/1.9 inherit;font-family:inherit;color:var(--pp);text-transform:uppercase;letter-spacing:.05em}
+.expt{white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}
+@media print{.vbadge{color:#176b45;border-color:#176b45}.exp{color:#333;border-color:#bbb}.expl{color:#4a2a9a}}
