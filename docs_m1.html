@@ -1,0 +1,187 @@
+<h2 id="docs">Документация сети</h2>
+<p class="lead">Все ВМ: <code>@ISP_WAN@</code> — NAT VirtualBox, <code>@MG_IF@</code> — Host-Only (управление с хоста). <span class="hint">Значения с подчёркиванием берутся из <button type="button" class="linkbtn" data-open-params>параметров сети</button>.</span></p>
+<div class="note"><b>Проверено по отчёту.</b> Метка <span class="vbadge">✓ стенд</span> стоит у блоков, решение которых выполнено на стенде автора в занятиях №4–9 (VLAN через etcnet, NAT в <code>/etc/nftables/nftables.nft</code>, GRE через <code>iptun</code>, OSPF с MD5, DHCP с override юнита, BIND в chroot). Добавлены проверки на типовые ошибки из отчёта: баннер, учётки, один маршрут по умолчанию, ключи хоста у клонов.</div>
+
+<h4 id="topology">Топология</h4>
+<div class="card topo">
+<svg class="topo-wide" viewBox="0 0 960 520" role="img" aria-label="Схема сети: ISP соединён с HQ-RTR и BR-RTR, между маршрутизаторами GRE-туннель, за HQ-RTR — HQ-SRV и HQ-CLI, за BR-RTR — BR-SRV" font-family="-apple-system,Segoe UI,Roboto,Arial,sans-serif">
+<rect x="390" y="14" width="180" height="34" rx="17" class="pill-s"/>
+<text x="480" y="36" text-anchor="middle" class="sm">Интернет · NAT VirtualBox</text>
+<line x1="480" y1="48" x2="480" y2="104" class="ln"/>
+<text x="488" y="82" class="mn">@ISP_WAN@ · DHCP</text>
+<rect x="400" y="104" width="160" height="54" rx="8" class="bx b-isp"/>
+<text x="480" y="128" text-anchor="middle" class="nm">ISP</text>
+<text x="480" y="146" text-anchor="middle" class="mn">mgmt @MG_ISP_DOT@</text>
+<line x1="400" y1="140" x2="210" y2="262" class="ln"/>
+<line x1="560" y1="140" x2="750" y2="262" class="ln"/>
+<text x="262" y="170" class="mn" text-anchor="middle">@ISP_HQ_SUBNET@</text>
+<text x="262" y="186" class="sm" text-anchor="middle">lab-isp-hq</text>
+<text x="698" y="170" class="mn" text-anchor="middle">@ISP_BR_SUBNET@</text>
+<text x="698" y="186" class="sm" text-anchor="middle">lab-isp-br</text>
+<text x="392" y="126" class="mn" text-anchor="end">@ISP_HQ_DOT@ @ISP_HQ_IF@</text>
+<text x="568" y="126" class="mn">@ISP_BR_DOT@ @ISP_BR_IF@</text>
+<text x="200" y="254" class="mn" text-anchor="end">@HQ_WAN_IP_DOT@ @HQ_WAN_IF@</text>
+<text x="760" y="254" class="mn">@BR_WAN_IP_DOT@ @BR_WAN_IF@</text>
+<rect x="110" y="262" width="200" height="56" rx="8" class="bx b-hq"/>
+<text x="210" y="286" text-anchor="middle" class="nm">HQ-RTR</text>
+<text x="210" y="304" text-anchor="middle" class="mn">mgmt @MG_HQRTR_DOT@ · rid @GRE_HQ_IP@</text>
+<rect x="650" y="262" width="200" height="56" rx="8" class="bx b-br"/>
+<text x="750" y="286" text-anchor="middle" class="nm">BR-RTR</text>
+<text x="750" y="304" text-anchor="middle" class="mn">mgmt @MG_BRRTR_DOT@ · rid @GRE_BR@</text>
+<line x1="310" y1="290" x2="650" y2="290" class="gre"/>
+<rect x="372" y="276" width="216" height="28" rx="6" class="gbg"/>
+<text x="480" y="295" text-anchor="middle" class="mn gt">GRE gre1 · @GRE_HQ_SUBNET@</text>
+<text x="480" y="324" text-anchor="middle" class="sm">OSPF area 0 · MD5</text>
+<text x="318" y="282" class="mn">@GRE_HQ_DOT@</text>
+<text x="642" y="282" class="mn" text-anchor="end">@GRE_BR_DOT@</text>
+<line x1="210" y1="318" x2="210" y2="384" class="ln"/>
+<text x="220" y="346" class="mn">@HQ_LAN_IF@ · trunk</text>
+<text x="220" y="362" class="sm">lab-core</text>
+<line x1="70" y1="384" x2="350" y2="384" class="bus"/>
+<line x1="120" y1="384" x2="120" y2="428" class="ln"/>
+<line x1="300" y1="384" x2="300" y2="428" class="ln"/>
+<rect x="40" y="428" width="160" height="70" rx="8" class="bx b-hq"/>
+<text x="120" y="452" text-anchor="middle" class="nm">HQ-SRV</text>
+<text x="120" y="470" text-anchor="middle" class="mn">VLAN @V_SRV@ · @HQ_SRV_IP_DOT@</text>
+<text x="120" y="487" text-anchor="middle" class="sm">DNS · SSH @SSH_PORT@</text>
+<rect x="220" y="428" width="160" height="70" rx="8" class="bx b-hq"/>
+<text x="300" y="452" text-anchor="middle" class="nm">HQ-CLI</text>
+<text x="300" y="470" text-anchor="middle" class="mn">VLAN @V_CLI@ · @HQ_CLI_IP_DOT@</text>
+<text x="300" y="487" text-anchor="middle" class="sm">DHCP-клиент</text>
+<line x1="750" y1="318" x2="750" y2="428" class="ln"/>
+<text x="760" y="346" class="mn">@BR_LAN_IF@ · trunk</text>
+<text x="760" y="362" class="sm">lab-core-br</text>
+<rect x="670" y="428" width="160" height="70" rx="8" class="bx b-br"/>
+<text x="750" y="452" text-anchor="middle" class="nm">BR-SRV</text>
+<text x="750" y="470" text-anchor="middle" class="mn">VLAN @V_SRV@ · @BR_SRV_IP_DOT@</text>
+<text x="750" y="487" text-anchor="middle" class="sm">SSH @SSH_PORT@</text>
+<text x="408" y="424" class="mn">HQ: @HQ_GW_SRV_SUBNET@ · @HQ_GW_CLI_SUBNET@</text>
+<text x="408" y="442" class="mn">VLAN @V_MGMT@: @HQ_GW_MGMT_SUBNET@</text>
+<text x="408" y="468" class="mn">BR: @BR_GW_SRV_SUBNET@ · @BR_GW_MGMT_SUBNET@</text>
+</svg>
+<svg class="topo-narrow" viewBox="0 0 360 600" role="img" aria-label="Схема сети (вертикальная)" font-family="-apple-system,Segoe UI,Roboto,Arial,sans-serif">
+<rect x="105" y="8" width="150" height="30" rx="15" class="pill-s"/>
+<text x="180" y="28" text-anchor="middle" class="sm">Интернет · NAT</text>
+<line x1="180" y1="38" x2="180" y2="78" class="ln"/>
+<text x="188" y="62" class="mn">@ISP_WAN@ · DHCP</text>
+<rect x="110" y="78" width="140" height="48" rx="8" class="bx b-isp"/>
+<text x="180" y="100" text-anchor="middle" class="nm">ISP</text>
+<text x="180" y="117" text-anchor="middle" class="mn">mgmt @MG_ISP_DOT@</text>
+<line x1="130" y1="126" x2="90" y2="220" class="ln"/>
+<line x1="230" y1="126" x2="270" y2="220" class="ln"/>
+<text x="104" y="142" class="mn" text-anchor="end">@ISP_HQ_DOT@ @ISP_HQ_IF@</text>
+<text x="256" y="142" class="mn">@ISP_BR_DOT@ @ISP_BR_IF@</text>
+<text x="8" y="168" class="mn">@ISP_HQ_SUBNET@</text>
+<text x="8" y="183" class="sm">lab-isp-hq</text>
+<text x="352" y="168" class="mn" text-anchor="end">@ISP_BR_SUBNET@</text>
+<text x="352" y="183" class="sm" text-anchor="end">lab-isp-br</text>
+<text x="10" y="212" class="mn">@HQ_WAN_IP_DOT@ @HQ_WAN_IF@</text>
+<text x="350" y="212" class="mn" text-anchor="end">@BR_WAN_IP_DOT@ @BR_WAN_IF@</text>
+<rect x="10" y="220" width="160" height="50" rx="8" class="bx b-hq"/>
+<text x="90" y="242" text-anchor="middle" class="nm">HQ-RTR</text>
+<text x="90" y="259" text-anchor="middle" class="mn">rid @GRE_HQ_IP@</text>
+<rect x="190" y="220" width="160" height="50" rx="8" class="bx b-br"/>
+<text x="270" y="242" text-anchor="middle" class="nm">BR-RTR</text>
+<text x="270" y="259" text-anchor="middle" class="mn">rid @GRE_BR@</text>
+<line x1="170" y1="245" x2="190" y2="245" class="gre"/>
+<text x="180" y="292" text-anchor="middle" class="mn gt">GRE · @GRE_HQ_SUBNET@</text>
+<text x="180" y="307" text-anchor="middle" class="sm">OSPF area 0 · MD5</text>
+<line x1="90" y1="270" x2="90" y2="370" class="ln"/>
+<polyline points="90,356 4,356 4,481 10,481" class="ln"/>
+<text x="98" y="334" class="mn">@HQ_LAN_IF@ · trunk</text>
+<line x1="270" y1="270" x2="270" y2="370" class="ln"/>
+<text x="262" y="352" class="mn" text-anchor="end">@BR_LAN_IF@ · trunk</text>
+<rect x="10" y="370" width="160" height="62" rx="8" class="bx b-hq"/>
+<text x="90" y="392" text-anchor="middle" class="nm">HQ-SRV</text>
+<text x="90" y="409" text-anchor="middle" class="mn">VLAN @V_SRV@ · @HQ_SRV_IP_DOT@</text>
+<text x="90" y="424" text-anchor="middle" class="sm">DNS · SSH @SSH_PORT@</text>
+<rect x="10" y="450" width="160" height="62" rx="8" class="bx b-hq"/>
+<text x="90" y="472" text-anchor="middle" class="nm">HQ-CLI</text>
+<text x="90" y="489" text-anchor="middle" class="mn">VLAN @V_CLI@ · @HQ_CLI_IP_DOT@</text>
+<text x="90" y="504" text-anchor="middle" class="sm">DHCP-клиент</text>
+<rect x="190" y="370" width="160" height="62" rx="8" class="bx b-br"/>
+<text x="270" y="392" text-anchor="middle" class="nm">BR-SRV</text>
+<text x="270" y="409" text-anchor="middle" class="mn">VLAN @V_SRV@ · @BR_SRV_IP_DOT@</text>
+<text x="270" y="424" text-anchor="middle" class="sm">SSH @SSH_PORT@</text>
+<text x="10" y="548" class="mn">HQ: @HQ_GW_SRV_SUBNET@ · @HQ_GW_CLI_SUBNET@</text>
+<text x="10" y="566" class="mn">VLAN @V_MGMT@: @HQ_GW_MGMT_SUBNET@</text>
+<text x="10" y="590" class="mn">BR: @BR_GW_SRV_SUBNET@ · @BR_GW_MGMT_SUBNET@</text>
+</svg>
+</div>
+
+<h4 id="vms">Виртуальные машины</h4>
+<div class="tw"><table>
+<tr><th>ВМ</th><th>FQDN</th><th>ОС</th><th>RAM</th><th>Роль</th></tr>
+<tr><td><span class="dev d-isp">ISP</span></td><td class="m">@H_ISP@</td><td>ALT Server 11.1</td><td>1 ГБ</td><td>Провайдер, NAT в Интернет, NTP</td></tr>
+<tr><td><span class="dev d-hq">HQ-RTR</span></td><td class="m">@H_HQRTR@</td><td>ALT Server 11.1</td><td>1 ГБ</td><td>VLAN-маршрутизация, GRE, OSPF, NAT, DHCP</td></tr>
+<tr><td><span class="dev d-hq">HQ-SRV</span></td><td class="m">@H_HQSRV@</td><td>ALT Server 11.1</td><td>1 ГБ</td><td>DNS (BIND), SSH</td></tr>
+<tr><td><span class="dev d-hq">HQ-CLI</span></td><td class="m">@H_HQCLI@</td><td>ALT Workstation 11.2</td><td>2 ГБ</td><td>Клиент, DHCP</td></tr>
+<tr><td><span class="dev d-br">BR-RTR</span></td><td class="m">@H_BRRTR@</td><td>ALT Server 11.1</td><td>1 ГБ</td><td>Маршрутизатор BR, GRE, OSPF, NAT</td></tr>
+<tr><td><span class="dev d-br">BR-SRV</span></td><td class="m">@H_BRSRV@</td><td>ALT Server 11.1</td><td>1 ГБ</td><td>SSH</td></tr>
+</table></div>
+
+<h4 id="addr">IP-адресация</h4>
+<div class="tw"><table>
+<tr><th>Устройство</th><th>Интерфейс</th><th>Адрес</th><th>Шлюз</th><th>Сеть VirtualBox / назначение</th></tr>
+<tr class="grp"><td colspan="5">ISP</td></tr>
+<tr><td><span class="dev d-isp">ISP</span></td><td class="m">@ISP_WAN@</td><td class="m">DHCP</td><td class="m">DHCP</td><td>NAT — выход в Интернет</td></tr>
+<tr><td></td><td class="m">@ISP_HQ_IF@</td><td class="m">@ISP_HQ@</td><td class="m">—</td><td><code>lab-isp-hq</code> → HQ-RTR</td></tr>
+<tr><td></td><td class="m">@ISP_BR_IF@</td><td class="m">@ISP_BR@</td><td class="m">—</td><td><code>lab-isp-br</code> → BR-RTR</td></tr>
+<tr class="grp"><td colspan="5">Офис HQ</td></tr>
+<tr><td><span class="dev d-hq">HQ-RTR</span></td><td class="m">@HQ_WAN_IF@</td><td class="m">@HQ_WAN_CIDR@</td><td class="m">@ISP_HQ_IP@</td><td><code>lab-isp-hq</code> → ISP</td></tr>
+<tr><td></td><td class="m">@HQ_LAN_IF@</td><td class="m">—</td><td class="m">—</td><td><code>lab-core</code>, trunk @V_SRV@/@V_CLI@/@V_MGMT@</td></tr>
+<tr><td></td><td class="m">@HQ_LAN_IF@.@V_SRV@</td><td class="m">@HQ_GW_SRV@</td><td class="m">—</td><td>VLAN @V_SRV@ — серверы</td></tr>
+<tr><td></td><td class="m">@HQ_LAN_IF@.@V_CLI@</td><td class="m">@HQ_GW_CLI@</td><td class="m">—</td><td>VLAN @V_CLI@ — клиенты</td></tr>
+<tr><td></td><td class="m">@HQ_LAN_IF@.@V_MGMT@</td><td class="m">@HQ_GW_MGMT@</td><td class="m">—</td><td>VLAN @V_MGMT@ — управление</td></tr>
+<tr><td></td><td class="m">gre1</td><td class="m">@GRE_HQ@</td><td class="m">—</td><td>Туннель к BR-RTR</td></tr>
+<tr><td><span class="dev d-hq">HQ-SRV</span></td><td class="m">@HQ_SRV_IF@.@V_SRV@</td><td class="m">@HQ_SRV_CIDR@</td><td class="m">@HQ_GW_SRV_IP@</td><td><code>lab-core</code>, VLAN @V_SRV@</td></tr>
+<tr><td><span class="dev d-hq">HQ-CLI</span></td><td class="m">@HQ_CLI_IF@.@V_CLI@</td><td class="m">@HQ_CLI_CIDR@</td><td class="m">@HQ_GW_CLI_IP@</td><td><code>lab-core</code>, VLAN @V_CLI@ · DHCP-резерв</td></tr>
+<tr class="grp"><td colspan="5">Офис BR</td></tr>
+<tr><td><span class="dev d-br">BR-RTR</span></td><td class="m">@BR_WAN_IF@</td><td class="m">@BR_WAN_CIDR@</td><td class="m">@ISP_BR_IP@</td><td><code>lab-isp-br</code> → ISP</td></tr>
+<tr><td></td><td class="m">@BR_LAN_IF@</td><td class="m">—</td><td class="m">—</td><td><code>lab-core-br</code>, trunk @V_SRV@/@V_MGMT@</td></tr>
+<tr><td></td><td class="m">@BR_LAN_IF@.@V_SRV@</td><td class="m">@BR_GW_SRV@</td><td class="m">—</td><td>VLAN @V_SRV@ — серверы</td></tr>
+<tr><td></td><td class="m">@BR_LAN_IF@.@V_MGMT@</td><td class="m">@BR_GW_MGMT@</td><td class="m">—</td><td>VLAN @V_MGMT@ — управление</td></tr>
+<tr><td></td><td class="m">gre1</td><td class="m">@GRE_BR_CIDR@</td><td class="m">—</td><td>Туннель к HQ-RTR</td></tr>
+<tr><td><span class="dev d-br">BR-SRV</span></td><td class="m">@BR_SRV_IF@.@V_SRV@</td><td class="m">@BR_SRV_CIDR@</td><td class="m">@BR_GW_SRV_IP@</td><td><code>lab-core-br</code>, VLAN @V_SRV@</td></tr>
+<tr class="grp"><td colspan="5">Управление (@MG_IF@, Host-Only)</td></tr>
+<tr><td colspan="5" class="m wrap">HQ-RTR @MG_HQRTR_CIDR@ · HQ-SRV @MG_HQSRV_CIDR@ · HQ-CLI @MG_HQCLI_CIDR@ · ISP @MG_ISP_CIDR@ · BR-RTR @MG_BRRTR_CIDR@ · BR-SRV @MG_BRSRV_CIDR@</td></tr>
+</table></div>
+
+<h4 id="vlan">VLAN и подсети</h4>
+<div class="tw"><table>
+<tr><th>VLAN</th><th>Назначение</th><th>HQ</th><th>BR</th></tr>
+<tr><td class="m">@V_SRV@</td><td>Серверы</td><td class="m">@HQ_GW_SRV_SUBNET@</td><td class="m">@BR_GW_SRV_SUBNET@</td></tr>
+<tr><td class="m">@V_CLI@</td><td>Клиенты</td><td class="m">@HQ_GW_CLI_SUBNET@</td><td class="m">—</td></tr>
+<tr><td class="m">@V_MGMT@</td><td>Управление</td><td class="m">@HQ_GW_MGMT_SUBNET@</td><td class="m">@BR_GW_MGMT_SUBNET@</td></tr>
+<tr><td class="m">—</td><td>GRE-туннель</td><td class="m" colspan="2">@GRE_HQ_SUBNET@ (HQ @GRE_HQ_DOT@ · BR @GRE_BR_DOT@)</td></tr>
+</table></div>
+<div class="note" id="kimcheck-wrap"><b>Соответствие размерам сетей из КИМ</b> <span class="hint">— пересчитывается при смене параметров</span>
+<ul class="kim" id="kimcheck"></ul>
+<p class="kim-foot">BR-FW на стенде отсутствует: сеть BR-FW ↔ BR-RTR и OSPF на нём не настраиваются, в DNS остаётся только запись <code>br-fw</code>.</p></div>
+
+<h4 id="services">Службы и учётные записи</h4>
+<div class="tw"><table class="svc">
+<tr><th>Служба</th><th>Где</th><th>Параметры</th></tr>
+<tr><td>Учётка <code>sshuser</code></td><td>HQ-SRV, BR-SRV</td><td>UID @SSH_UID@, пароль <code>@PW@</code>, sudo без пароля</td></tr>
+<tr><td>Учётка <code>net_admin</code></td><td>HQ-RTR, BR-RTR</td><td>Пароль <code>@PW@</code>, sudo без пароля</td></tr>
+<tr><td>SSH</td><td>HQ-SRV, BR-SRV</td><td>Порт @SSH_PORT@, <code>AllowUsers sshuser</code>, <code>MaxAuthTries 2</code>, баннер «@BANNER@»</td></tr>
+<tr><td>GRE</td><td>HQ-RTR ↔ BR-RTR</td><td>@HQ_WAN_IP@ ↔ @BR_WAN_IP@, TTL 255, @GRE_HQ_SUBNET@</td></tr>
+<tr><td>OSPF (FRR)</td><td>HQ-RTR, BR-RTR</td><td>Area 0, router-id @GRE_HQ_IP@ / @GRE_BR@, активен только gre1, MD5-ключ 1 <code>@PW@</code></td></tr>
+<tr><td>NAT (nftables)</td><td>ISP, HQ-RTR, BR-RTR</td><td>Masquerade: ISP → @ISP_WAN@, HQ-RTR → @HQ_WAN_IF@, BR-RTR → @BR_WAN_IF@</td></tr>
+<tr><td>DHCP (ISC)</td><td>HQ-RTR</td><td>@HQ_LAN_IF@.@V_CLI@, пул @DHCP_FROM@–@DHCP_TO@, шлюз @HQ_GW_CLI_IP@, DNS @HQ_SRV_IP@, суффикс @DOMAIN@, резерв HQ-CLI @HQ_CLI_IP@</td></tr>
+<tr><td>DNS (BIND)</td><td>HQ-SRV</td><td>Зона @DOMAIN@ + @REV_HQ@ / @REV_BR@, пересылка @DNS_FWD@</td></tr>
+<tr><td>Часовой пояс</td><td>Все</td><td>@TZ@</td></tr>
+</table></div>
+
+<h4 id="dns">DNS-записи (таблица 3 КИМ)</h4>
+<div class="tw"><table>
+<tr><th>Имя</th><th>Тип</th><th>Адрес</th><th>Устройство</th></tr>
+<tr><td class="m">@H_HQRTR@</td><td>A</td><td class="m">@HQ_GW_MGMT_IP@</td><td>HQ-RTR</td></tr>
+<tr><td class="m">@H_BRRTR@</td><td>A</td><td class="m">@BR_GW_MGMT_IP@</td><td>BR-RTR</td></tr>
+<tr><td class="m">br-fw.@DOMAIN@</td><td>A</td><td class="m">@BR_FW_IP@</td><td>BR-FW (нет на стенде)</td></tr>
+<tr><td class="m">@H_HQSRV@</td><td>A, PTR</td><td class="m">@HQ_SRV_IP@</td><td>HQ-SRV</td></tr>
+<tr><td class="m">@H_HQCLI@</td><td>A</td><td class="m">@HQ_CLI_IP@</td><td>HQ-CLI</td></tr>
+<tr><td class="m">@H_BRSRV@</td><td>A, PTR</td><td class="m">@BR_SRV_IP@</td><td>BR-SRV</td></tr>
+<tr><td class="m">docker.@DOMAIN@</td><td>A</td><td class="m">@ISP_HQ_IP@</td><td>ISP (к HQ-RTR)</td></tr>
+<tr><td class="m">web.@DOMAIN@</td><td>A</td><td class="m">@ISP_BR_IP@</td><td>ISP (к BR-RTR)</td></tr>
+</table></div>
