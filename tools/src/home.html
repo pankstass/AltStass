@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESC}}">
+<link rel="canonical" href="{{OG_URL}}">
+<meta name="theme-color" content="#121212">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="alt stass · стенд au-team.irpo">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="{{DESC}}">
+<meta property="og:url" content="{{OG_URL}}">
+<meta property="og:image" content="{{SITE_URL}}assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/favicon.png">
+<link rel="stylesheet" href="assets/style.css">
+<script>/* старые ссылки index.html#t5 вели на Модуль 1 — переадресация до отрисовки */
+(function(){var m={{IDMAP}},f={{FILES}};function go(){var h=location.hash.slice(1);if(h&&m[h])location.replace(f[m[h]]+"#"+h);}go();window.addEventListener("hashchange",go);})();</script>
+</head>
+<body data-page="home" class="home">
+<a class="skip" href="#modules">К модулям</a>
+<div class="hwrap">
+<header class="hhero">
+<img class="hlogo" src="assets/logo.webp" alt="alt stass" width="360" height="319">
+<div>
+<p class="kicker">Учебный стенд au-team.irpo · ДЭ 09.02.06 · ALT Linux</p>
+<h1>Стенд для демоэкзамена <em>09.02.06</em></h1>
+<p class="hlead">Документация сети и команды настройки шести ВМ VirtualBox в порядке заданий КИМ 09.02.06-1-2027 (профильный уровень). Команды копируются в один клик и пересобираются под ваши адреса, интерфейсы и пароли.</p>
+<nav class="mods hmods" aria-label="Разделы сайта">{{MODS}}</nav>
+</div>
+</header>
+
+<h2 id="modules">Модули</h2>
+<div class="mcards">
+{{CARDS}}
+</div>
+
+<h2 id="how">Как пользоваться</h2>
+<ol class="howto">
+<li><b>Задайте параметры.</b> На странице любого модуля нажмите «⚙ Параметры сети» и укажите свои интерфейсы, адреса и пароли — значения общие для всех модулей и хранятся в браузере.</li>
+<li><b>Выполняйте по шагам.</b> Шаги идут в порядке пунктов КИМ; у каждого блока — метки ВМ, кнопка «Копировать» и отметка «готово». Фильтр по ВМ собирает все её команды в один <code>.sh</code>.</li>
+<li><b>Сверяйте вывод.</b> У проверок есть подсказка «Ожидается». Метка <span class="vbadge">✓ стенд</span> — блок выполнен на стенде автора.</li>
+<li><b>Фиксируйте состояние.</b> После каждого занятия — снапшот на выключенной ВМ (<code>poweroff</code>), имена — по паспорту стенда.</li>
+</ol>
+
+<h2 id="pitfalls">Где теряют баллы</h2>
+<p class="lead">Итог разбора отчёта по стенду: ошибки, которые встречаются чаще всего. Каждая ссылка ведёт на шаг с правильной командой и проверкой.</p>
+<ul class="pitfalls">
+{{PITFALLS}}
+</ul>
+
+<h2 id="lessons">Занятия и снапшоты</h2>
+<p class="lead">Соответствие занятий паспорта стенда страницам сайта. Снапшот делается в конце занятия на всех изменённых ВМ.</p>
+<div class="tw"><table class="lessons">
+<tr><th>№</th><th>Занятие</th><th>На сайте</th><th>Снапшот</th></tr>
+{{LESSONS}}
+</table></div>
+
+<h2 id="stand">Состав стенда</h2>
+<div class="tw"><table>
+<tr><th>ВМ</th><th>ОС · ОЗУ</th><th>Модуль 1</th><th>Модуль 2</th><th>Модуль 3</th></tr>
+<tr><td><span class="dev d-isp">ISP</span></td><td>ALT Server · 1 ГБ</td><td>NAT в Интернет, @ISP_HQ_SUBNET@, @ISP_BR_SUBNET@</td><td>NTP stratum 5</td><td>nginx: reverse proxy, Basic Auth, HTTPS</td></tr>
+<tr><td><span class="dev d-hq">HQ-RTR</span></td><td>ALT Server · 1 ГБ</td><td>VLAN @V_SRV@/@V_CLI@/@V_MGMT@, GRE, OSPF, NAT, DHCP</td><td>DNAT @EXT_PORT@, @SSH_PORT@ → HQ-SRV</td><td>транзит</td></tr>
+<tr><td><span class="dev d-hq">HQ-SRV</span></td><td>ALT Server · 2 ГБ</td><td>DNS (BIND), @HQ_SRV_IP@</td><td>RAID 0, NFS, Apache + MariaDB</td><td>ЦС, atop, CUPS, fail2ban, источник бэкапа</td></tr>
+<tr><td><span class="dev d-hq">HQ-CLI</span></td><td>ALT Workstation · 2 ГБ, 2 CPU</td><td>DHCP-клиент, @HQ_CLI_IP@</td><td>домен (winbind), NFS-клиент, Яндекс Браузер</td><td>доверие к ЦС, клиент CUPS, хранилище Borg</td></tr>
+<tr><td><span class="dev d-br">BR-RTR</span></td><td>ALT Server · 1 ГБ</td><td>GRE, OSPF, NAT</td><td>DNAT @EXT_PORT@, @SSH_PORT@ → BR-SRV</td><td>транзит</td></tr>
+<tr><td><span class="dev d-br">BR-SRV</span></td><td>ALT Server · 2 ГБ</td><td>@BR_SRV_IP@</td><td>Samba DC, Ansible, Docker</td><td>импорт пользователей, инвентаризация</td></tr>
+</table></div>
+
+<footer>
+<p>Стенд: Панков С. А., НовГУ · КИМ 09.02.06-1-2027 · сайт v{{VERSION}}</p>
+</footer>
+</div>
+<script src="assets/params.js"></script>
+<script src="assets/home.js"></script>
+</body>
+</html>

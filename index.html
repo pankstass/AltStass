@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Стенд au-team.irpo · ДЭ 09.02.06 — главная</title>
+<meta name="description" content="Документация сети и команды настройки учебного стенда (ALT Linux) по трём модулям демоэкзамена 09.02.06. Команды пересобираются под ваши параметры сети.">
+<link rel="canonical" href="https://USERNAME.github.io/REPO/">
+<meta name="theme-color" content="#121212">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="alt stass · стенд au-team.irpo">
+<meta property="og:title" content="Стенд au-team.irpo · ДЭ 09.02.06 — главная">
+<meta property="og:description" content="Документация сети и команды настройки учебного стенда (ALT Linux) по трём модулям демоэкзамена 09.02.06. Команды пересобираются под ваши параметры сети.">
+<meta property="og:url" content="https://USERNAME.github.io/REPO/">
+<meta property="og:image" content="https://USERNAME.github.io/REPO/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/favicon.png">
+<link rel="stylesheet" href="assets/style.css">
+<script>/* старые ссылки index.html#t5 вели на Модуль 1 — переадресация до отрисовки */
+(function(){var m={"docs":"m1","kimcheck":"m1","topology":"m1","vms":"m1","addr":"m1","vlan":"m1","services":"m1","dns":"m1","prep":"m1","t1":"m1","t2":"m1","t3":"m1","t4":"m1","t5":"m1","t6":"m1","t7":"m1","t8":"m1","t9":"m1","t10":"m1","t11":"m1","check":"m1","prep-1":"m1","prep-2":"m1","prep-3":"m1","prep-4":"m1","prep-5":"m1","prep-6":"m1","prep-7":"m1","prep-8":"m1","prep-9":"m1","prep-10":"m1","prep-11":"m1","prep-12":"m1","prep-13":"m1","prep-14":"m1","t1-1":"m1","t1-2":"m1","t1-3":"m1","t1-4":"m1","t1-5":"m1","t1-6":"m1","t2-1":"m1","t2-2":"m1","t3-1":"m1","t3-2":"m1","t3-3":"m1","t4-1":"m1","t4-2":"m1","t4-3":"m1","t5-1":"m1","t5-2":"m1","t6-1":"m1","t6-2":"m1","t6-3":"m1","t7-1":"m1","t7-2":"m1","t7-3":"m1","t8-1":"m1","t8-2":"m1","t8-3":"m1","t9-1":"m1","t9-2":"m1","t9-3":"m1","t10-1":"m1","t10-2":"m1","t10-3":"m1","t10-4":"m1","t11-1":"m1","check-1":"m1","check-2":"m1","check-3":"m1"},f={"m1":"m1-network.html","m2":"m2-admin.html","m3":"m3-services.html"};function go(){var h=location.hash.slice(1);if(h&&m[h])location.replace(f[m[h]]+"#"+h);}go();window.addEventListener("hashchange",go);})();</script>
+</head>
+<body data-page="home" class="home">
+<a class="skip" href="#modules">К модулям</a>
+<div class="hwrap">
+<header class="hhero">
+<img class="hlogo" src="assets/logo.webp" alt="alt stass" width="360" height="319">
+<div>
+<p class="kicker">Учебный стенд au-team.irpo · ДЭ 09.02.06 · ALT Linux</p>
+<h1>Стенд для демоэкзамена <em>09.02.06</em></h1>
+<p class="hlead">Документация сети и команды настройки шести ВМ VirtualBox в порядке заданий КИМ 09.02.06-1-2027 (профильный уровень). Команды копируются в один клик и пересобираются под ваши адреса, интерфейсы и пароли.</p>
+<nav class="mods hmods" aria-label="Разделы сайта"><a href="index.html" class="mhome" title="Главная" aria-current="page">Главная</a><a href="m1-network.html" title="Модуль 1. Настройка сетевой инфраструктуры">М1</a><a href="m2-admin.html" title="Модуль 2. Организация сетевого администрирования">М2</a><a href="m3-services.html" title="Модуль 3. Эксплуатация объектов сетевой инфраструктуры">М3</a></nav>
+</div>
+</header>
+
+<h2 id="modules">Модули</h2>
+<div class="mcards">
+<a class="mcard" href="m1-network.html" data-mod="m1" data-blocks="prep-1 prep-2 prep-3 prep-4 prep-5 prep-6 prep-7 prep-8 prep-9 prep-10 prep-11 prep-12 prep-13 prep-14 t1-1 t1-2 t1-3 t1-4 t1-5 t1-6 t2-1 t2-2 t3-1 t3-2 t3-3 t4-1 t4-2 t4-3 t5-1 t5-2 t6-1 t6-2 t6-3 t7-1 t7-2 t7-3 t8-1 t8-2 t8-3 t9-1 t9-2 t9-3 t10-1 t10-2 t10-3 t10-4 t11-1 check-1 check-2 check-3">
+<span class="mk"><span class="mnum">1</span>Задание 1 КИМ · занятия №3–9</span>
+<span class="mt">Настройка сетевой инфраструктуры</span><span class="md">Адресация, VLAN, GRE и OSPF, NAT, DHCP, DNS, SSH, часовой пояс.</span>
+<span class="mstat">13 шагов · 50 блоков · <span class="vbadge">✓ стенд</span> 15</span>
+<span class="mprog" aria-hidden="true"><span data-bar></span></span><span class="mdone" data-done>не начат</span></a>
+<a class="mcard" href="m2-admin.html" data-mod="m2" data-blocks="m2t1-1 m2t1-2 m2t1-3 m2t1-4 m2t1-5 m2t1-6 m2t2-1 m2t2-2 m2t3-1 m2t3-2 m2t3-3 m2t4-1 m2t4-2 m2t4-3 m2t4-4 m2t5-1 m2t5-2 m2t5-3 m2t5-4 m2t5-5 m2t6-1 m2t6-2 m2t7-1 m2t7-2 m2t7-3 m2t7-4 m2t8-1 m2t8-2 m2t8-3 m2t8-4 m2t9-1">
+<span class="mk"><span class="mnum">2</span>Задание 2 КИМ · занятия №10–12</span>
+<span class="mt">Организация сетевого администрирования</span><span class="md">Samba DC и вход в домен, RAID 0, NFS, chrony, Ansible, Docker, Apache + MariaDB, DNAT, Яндекс Браузер.</span>
+<span class="mstat">9 шагов · 31 блоков · <span class="vbadge">✓ стенд</span> 24</span>
+<span class="mprog" aria-hidden="true"><span data-bar></span></span><span class="mdone" data-done>не начат</span></a>
+<a class="mcard" href="m3-services.html" data-mod="m3" data-blocks="m3t1-1 m3t1-2 m3t2-1 m3t2-2 m3t3-1 m3t3-2 m3t4-1 m3t4-2 m3t4-3 m3t4-4 m3t4-5 m3t4-6 m3t4-7 m3t5-1 m3t5-2 m3t6-1 m3t6-2 m3t6-3 m3t7-1 m3t7-2 m3t8-1 m3t8-2 m3t8-3 m3t9-1 m3t9-2 m3t9-3 m3t9-4 m3t9-5 m3t9-6 m3t9-7">
+<span class="mk"><span class="mnum">3</span>Задание 3 КИМ · занятия №13–15</span>
+<span class="mt">Эксплуатация объектов сетевой инфраструктуры</span><span class="md">Импорт пользователей, nginx reverse proxy с Basic Auth, свой ЦС и HTTPS, atop, CUPS, инвентаризация Ansible, fail2ban, BorgBackup.</span>
+<span class="mstat">9 шагов · 30 блоков · <span class="vbadge">✓ стенд</span> 21</span>
+<span class="mprog" aria-hidden="true"><span data-bar></span></span><span class="mdone" data-done>не начат</span></a>
+</div>
+
+<h2 id="how">Как пользоваться</h2>
+<ol class="howto">
+<li><b>Задайте параметры.</b> На странице любого модуля нажмите «⚙ Параметры сети» и укажите свои интерфейсы, адреса и пароли — значения общие для всех модулей и хранятся в браузере.</li>
+<li><b>Выполняйте по шагам.</b> Шаги идут в порядке пунктов КИМ; у каждого блока — метки ВМ, кнопка «Копировать» и отметка «готово». Фильтр по ВМ собирает все её команды в один <code>.sh</code>.</li>
+<li><b>Сверяйте вывод.</b> У проверок есть подсказка «Ожидается». Метка <span class="vbadge">✓ стенд</span> — блок выполнен на стенде автора.</li>
+<li><b>Фиксируйте состояние.</b> После каждого занятия — снапшот на выключенной ВМ (<code>poweroff</code>), имена — по паспорту стенда.</li>
+</ol>
+
+<h2 id="pitfalls">Где теряют баллы</h2>
+<p class="lead">Итог разбора отчёта по стенду: ошибки, которые встречаются чаще всего. Каждая ссылка ведёт на шаг с правильной командой и проверкой.</p>
+<ul class="pitfalls">
+<li><a href="m1-network.html#t5">Баннер SSH дословно «<span class="v" data-k="BANNER">Authorized access only</span>» и одинаковый на всех ВМ — транслит и «For autorized!!!» не засчитываются</a></li>
+<li><a href="m1-network.html#t3">На серверах — <code>sshuser</code> (UID <span class="v" data-k="SSH_UID">2027</span>), на маршрутизаторах — <code>net_admin</code>; то же в <code>AllowUsers</code> и инвентаре Ansible</a></li>
+<li><a href="m1-network.html#check">Ровно один маршрут по умолчанию: лишний <code>default</code> через сеть управления <span class="v" data-k="MG_IF">enp0s8</span> ломает выход в Интернет</a></li>
+<li><a href="m1-network.html#t7">OSPF только на gre1: <code>passive-interface default</code> и явный <code>router-id</code>, иначе выбирается адрес сети управления</a></li>
+<li><a href="m1-network.html#prep">Клонированные ВМ: новые ключи хоста SSH и machine-id — иначе у разных ВМ один отпечаток</a></li>
+<li><a href="m1-network.html#t9">DHCP выдаёт только DNS HQ-SRV (<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>), без посторонних 1.1.1.1 / 8.8.8.8</a></li>
+<li><a href="m1-network.html#vlan">Маски по КИМ: VLAN серверов /27, клиентов /28, управления /29 (кнопка «Маски по КИМ» в параметрах); VLAN <span class="v" data-k="V_MGMT">999</span> — тоже по КИМ</a></li>
+<li><a href="m1-network.html#t11">Часовой пояс <span class="v" data-k="TZ">Europe/Moscow</span> на всех шести ВМ, а не только на HQ-CLI</a></li>
+<li><a href="m2-admin.html#m2t1">Файлы в <code>/etc/sudoers.d</code> — права 0400, иначе visudo ругается; после ужесточения SSH не возвращать вход по паролю на всех ВМ</a></li>
+<li><a href="m3-services.html#m3t4">Сертификаты ровно на <span class="v" data-k="CA_DAYS">30</span> дней, доверие на HQ-CLI — <code>update-ca-trust</code>, а не <code>update-ca-certificates</code></a></li>
+<li><a href="m3-services.html#m3t5">atop: <code>LOGINTERVAL=<span class="v" data-k="ATOP_INT">420</span></code> записан в <code>/etc/default/atop</code>, иначе после перезагрузки сбросится</a></li>
+<li><a href="m3-services.html#m3t8">fail2ban следит за портом <span class="v" data-k="SSH_PORT">2027</span>, а не 22; <code>bantime</code> — в секундах</a></li>
+</ul>
+
+<h2 id="lessons">Занятия и снапшоты</h2>
+<p class="lead">Соответствие занятий паспорта стенда страницам сайта. Снапшот делается в конце занятия на всех изменённых ВМ.</p>
+<div class="tw"><table class="lessons">
+<tr><th>№</th><th>Занятие</th><th>На сайте</th><th>Снапшот</th></tr>
+<tr><td class="m">3</td><td>Развёртывание стенда и L2</td><td><a href="m1-network.html#prep">Подготовка</a></td><td><code>pre-lab4</code></td></tr>
+<tr><td class="m">4</td><td>Конфигурация узла и ужесточение доступа</td><td><a href="m1-network.html#t1">М1 п.1</a> · <a href="m1-network.html#t3">п.3</a> · <a href="m1-network.html#t5">п.5</a> · <a href="m1-network.html#t11">п.11</a></td><td><code>pre-lab5</code></td></tr>
+<tr><td class="m">5</td><td>VLAN 802.1Q и меж-VLAN маршрутизация</td><td><a href="m1-network.html#t4">М1 п.4</a></td><td><code>pre-lab6</code></td></tr>
+<tr><td class="m">6</td><td>Петли, STP и защита L2</td><td><span class="hint">вне КИМ, на сайте нет</span></td><td><code>—</code></td></tr>
+<tr><td class="m">7</td><td>ISP и доступ в Интернет</td><td><a href="m1-network.html#t2">М1 п.2</a></td><td><code>pre-lab8</code></td></tr>
+<tr><td class="m">8</td><td>GRE-туннель, OSPF с MD5, NAT</td><td><a href="m1-network.html#t6">М1 п.6</a> · <a href="m1-network.html#t7">п.7</a> · <a href="m1-network.html#t8">п.8</a></td><td><code>pre-lab9</code></td></tr>
+<tr><td class="m">9</td><td>DHCP, DNS и финальная сверка</td><td><a href="m1-network.html#t9">М1 п.9</a> · <a href="m1-network.html#t10">п.10</a> · <a href="m1-network.html#check">проверка</a></td><td><code>task1-done</code></td></tr>
+<tr><td class="m">10</td><td>Домен, пользователи, политики и время</td><td><a href="m2-admin.html#m2t1">М2 п.1</a> · <a href="m2-admin.html#m2t4">п.4</a></td><td><code>dc-ready, pre-lab11</code></td></tr>
+<tr><td class="m">11</td><td>RAID, NFS и Ansible</td><td><a href="m2-admin.html#m2t2">М2 п.2</a> · <a href="m2-admin.html#m2t3">п.3</a> · <a href="m2-admin.html#m2t5">п.5</a></td><td><code>pre-lab12</code></td></tr>
+<tr><td class="m">12</td><td>Docker, веб-приложение, DNAT и браузер</td><td><a href="m2-admin.html#m2t6">М2 п.6</a> · <a href="m2-admin.html#m2t7">п.7</a> · <a href="m2-admin.html#m2t8">п.8</a> · <a href="m2-admin.html#m2t9">п.9</a></td><td><code>task2-done</code></td></tr>
+<tr><td class="m">13</td><td>Импорт пользователей, reverse proxy, web-аутентификация</td><td><a href="m3-services.html#m3t1">М3 п.1</a> · <a href="m3-services.html#m3t2">п.2</a> · <a href="m3-services.html#m3t3">п.3</a></td><td><code>pre-lab14 *</code></td></tr>
+<tr><td class="m">14</td><td>Центр сертификации, мониторинг и печать</td><td><a href="m3-services.html#m3t4">М3 п.4</a> · <a href="m3-services.html#m3t5">п.5</a> · <a href="m3-services.html#m3t6">п.6</a></td><td><code>pre-lab15 *</code></td></tr>
+<tr><td class="m">15</td><td>Автоматизация, защита SSH и бэкап</td><td><a href="m3-services.html#m3t7">М3 п.7</a> · <a href="m3-services.html#m3t8">п.8</a> · <a href="m3-services.html#m3t9">п.9</a></td><td><code>task3-done *</code></td></tr>
+<tr><td colspan="4" class="hint">* в паспорте имена снапшотов для занятий №13–15 не заданы — предложены по тому же принципу.</td></tr>
+</table></div>
+
+<h2 id="stand">Состав стенда</h2>
+<div class="tw"><table>
+<tr><th>ВМ</th><th>ОС · ОЗУ</th><th>Модуль 1</th><th>Модуль 2</th><th>Модуль 3</th></tr>
+<tr><td><span class="dev d-isp">ISP</span></td><td>ALT Server · 1 ГБ</td><td>NAT в Интернет, <span class="v" data-k="ISP_HQ_SUBNET">172.16.1.0/28</span>, <span class="v" data-k="ISP_BR_SUBNET">172.16.2.0/28</span></td><td>NTP stratum 5</td><td>nginx: reverse proxy, Basic Auth, HTTPS</td></tr>
+<tr><td><span class="dev d-hq">HQ-RTR</span></td><td>ALT Server · 1 ГБ</td><td>VLAN <span class="v" data-k="V_SRV">100</span>/<span class="v" data-k="V_CLI">200</span>/<span class="v" data-k="V_MGMT">999</span>, GRE, OSPF, NAT, DHCP</td><td>DNAT <span class="v" data-k="EXT_PORT">8080</span>, <span class="v" data-k="SSH_PORT">2027</span> → HQ-SRV</td><td>транзит</td></tr>
+<tr><td><span class="dev d-hq">HQ-SRV</span></td><td>ALT Server · 2 ГБ</td><td>DNS (BIND), <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span></td><td>RAID 0, NFS, Apache + MariaDB</td><td>ЦС, atop, CUPS, fail2ban, источник бэкапа</td></tr>
+<tr><td><span class="dev d-hq">HQ-CLI</span></td><td>ALT Workstation · 2 ГБ, 2 CPU</td><td>DHCP-клиент, <span class="v" data-k="HQ_CLI_IP">10.0.200.30</span></td><td>домен (winbind), NFS-клиент, Яндекс Браузер</td><td>доверие к ЦС, клиент CUPS, хранилище Borg</td></tr>
+<tr><td><span class="dev d-br">BR-RTR</span></td><td>ALT Server · 1 ГБ</td><td>GRE, OSPF, NAT</td><td>DNAT <span class="v" data-k="EXT_PORT">8080</span>, <span class="v" data-k="SSH_PORT">2027</span> → BR-SRV</td><td>транзит</td></tr>
+<tr><td><span class="dev d-br">BR-SRV</span></td><td>ALT Server · 2 ГБ</td><td><span class="v" data-k="BR_SRV_IP">10.1.100.20</span></td><td>Samba DC, Ansible, Docker</td><td>импорт пользователей, инвентаризация</td></tr>
+</table></div>
+
+<footer>
+<p>Стенд: Панков С. А., НовГУ · КИМ 09.02.06-1-2027 · сайт v1.4</p>
+</footer>
+</div>
+<script src="assets/params.js"></script>
+<script src="assets/home.js"></script>
+</body>
+</html>

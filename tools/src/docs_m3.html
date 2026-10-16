@@ -1,0 +1,24 @@
+<h2 id="docs">Что понадобится</h2>
+<p class="lead">Модуль 3 выполняется поверх Модулей 1 и 2: нужны DNS-записи <code>web</code> и <code>docker</code>, проброс портов на маршрутизаторах, домен на BR-SRV и инвентарь Ansible. <span class="hint">Значения с подчёркиванием берутся из <button type="button" class="linkbtn" data-open-params>параметров сети</button>.</span></p>
+<div class="note"><b>Проверено на стенде.</b> Блоки с меткой <span class="vbadge">✓ стенд</span> выполнены на стенде автора (занятия №13–15) и записаны по отчёту. Блоки-проверки без метки добавлены для самоконтроля: на стенде они не снимались, сверяйте вывод с подсказкой «Ожидается».</div>
+<h4 id="needs">Подготовка</h4>
+<div class="tw"><table>
+<tr><th>ВМ</th><th>Что нужно</th><th>Для пунктов</th></tr>
+<tr><td><span class="dev d-br">BR-SRV</span></td><td>Additional.iso (<code>@ISO_DEV@</code> → <code>@ISO_DIR@</code>), работающий домен @REALM@, Ansible с инвентарём из Модуля 2</td><td>1, 7</td></tr>
+<tr><td><span class="dev d-isp">ISP</span></td><td>Доступ в репозиторий; DNAT на HQ-RTR (@HQ_WAN_IP@) и BR-RTR (@BR_WAN_IP@) из задания 8 Модуля 2</td><td>2, 3, 4</td></tr>
+<tr><td><span class="dev d-hq">HQ-SRV</span></td><td>ОЗУ 2 ГБ; SSH на порту @SSH_PORT@ (пользователь <code>sshuser</code>)</td><td>4, 5, 6, 8, 9</td></tr>
+<tr><td><span class="dev d-hq">HQ-CLI</span></td><td>sshd на порту @ANS_PORT@ (из задания 5 Модуля 2), DNS — HQ-SRV</td><td>4, 6, 9</td></tr>
+</table></div>
+<h4 id="services">Службы Модуля 3</h4>
+<div class="tw"><table class="svc">
+<tr><th>Служба</th><th>Где</th><th>Параметры</th></tr>
+<tr><td>Импорт пользователей</td><td>BR-SRV</td><td><code>import.sh users.csv</code> с Additional.iso, CRLF → LF</td></tr>
+<tr><td>Обратный прокси</td><td>ISP</td><td>nginx: <code>web.@DOMAIN@</code> → @HQ_WAN_IP@:@EXT_PORT@ (HQ-SRV), <code>docker.@DOMAIN@</code> → @BR_WAN_IP@:@EXT_PORT@ (BR-SRV)</td></tr>
+<tr><td>Web-аутентификация</td><td>ISP</td><td>Basic Auth для web: <code>@WEB_USER@</code> / <code>@PW@</code>, <code>/etc/nginx/.htpasswd</code></td></tr>
+<tr><td>Центр сертификации</td><td>HQ-SRV → ISP, HQ-CLI</td><td><code>/etc/ssl/ca</code>, CN «@WG@ CA», сертификаты web и docker на @CA_DAYS@ дней, HTTP → HTTPS</td></tr>
+<tr><td>atop</td><td>HQ-SRV</td><td><code>LOGINTERVAL=@ATOP_INT@</code> в <code>/etc/default/atop</code></td></tr>
+<tr><td>CUPS</td><td>HQ-SRV → HQ-CLI</td><td>принтер <code>PDF</code> (cups-pdf), на HQ-CLI — <code>PDF-Printer</code> по умолчанию</td></tr>
+<tr><td>Инвентаризация</td><td>BR-SRV</td><td><code>/etc/ansible/playbook/inventory.yml</code> → <code>/etc/ansible/PC-INFO/*.yml</code></td></tr>
+<tr><td>fail2ban</td><td>HQ-SRV</td><td>jail sshd, порт @SSH_PORT@, @F2B_RETRY@ попытки, бан @F2B_BAN@ с</td></tr>
+<tr><td>BorgBackup</td><td>HQ-SRV → HQ-CLI</td><td><code>/etc</code> → <code>borguser@@HQ_CLI_IP@:/backup/hq-srv</code>, append-only, repokey, таймер daily</td></tr>
+</table></div>
