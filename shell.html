@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESC}}">
+<link rel="canonical" href="{{OG_URL}}">
+<meta name="theme-color" content="#121212">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="alt stass · стенд au-team.irpo">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="Документация сети и команды настройки стенда ДЭ 09.02.06 (ALT Linux) с копированием в один клик.">
+<meta property="og:url" content="{{OG_URL}}">
+<meta property="og:image" content="{{SITE_URL}}assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/favicon.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="{{PAGE_ID}}">
+<a class="skip" href="#cmds">К командам</a>
+<div class="wrap">
+<aside aria-label="Навигация">
+<a class="logo" href="index.html" aria-label="alt stass — на главную"><img src="assets/logo.webp" alt="alt stass" width="360" height="319"></a>
+<nav class="mods" aria-label="Разделы сайта">{{MODS}}</nav>
+<button type="button" class="pbtn side" data-open-params>⚙ Параметры сети</button>
+<div class="lbl">Документация</div>
+<ul class="toc">
+{{DOC_TOC}}
+</ul>
+<div class="lbl">Команды <span class="prog-txt" data-prog-txt></span></div>
+<ul class="toc">
+{{TOC}}
+</ul>
+<button type="button" class="linkbtn reset-done" data-reset-done>Сбросить отметки «готово»</button>
+</aside>
+<main>
+<header>
+<img class="mlogo" src="assets/logo.webp" alt="alt stass" width="360" height="319">
+<nav class="mods mmods" aria-label="Разделы сайта">{{MODS}}</nav>
+<p class="kicker">Учебный стенд au-team.irpo · ДЭ 09.02.06</p>
+<h1>{{H1}}</h1>
+<p>{{LEAD}}</p>
+<div class="hbar">
+<button type="button" class="pbtn" data-open-params>⚙ Параметры сети</button>
+<span class="pstate" data-pstate>Параметры стенда по умолчанию</span>
+</div>
+<div class="prog" aria-hidden="true"><span data-prog></span></div>
+</header>
+
+{{DOCS}}
+
+<h2 id="cmds">Команды настройки</h2>
+<p class="lead">Каждый блок копируется целиком и вставляется в терминал под root. Отмечайте выполненные блоки галочкой — отметки сохраняются в браузере.</p>
+<div class="filter" role="search">
+<div class="frow" role="group" aria-label="Фильтр по устройству">
+<button type="button" data-f="" aria-pressed="true">Все</button>{{FILTER}}
+</div>
+<div class="frow">
+<label class="search"><span class="sr">Поиск по командам</span><input type="search" placeholder="Поиск по командам…" data-search autocomplete="off"></label>
+<label class="tgl"><input type="checkbox" data-hl checked> Подсветка параметров</label>
+</div>
+<div class="devact" data-devact hidden>
+<span data-devact-txt></span>
+<button type="button" class="act" data-copy-all>Скопировать всё</button>
+<button type="button" class="act" data-download>Скачать .sh</button>
+</div>
+</div>
+<p class="empty" data-empty hidden>Ничего не найдено.</p>
+{{STEPS}}
+<nav class="pager" aria-label="Соседние модули">{{PAGER}}</nav>
+<footer>
+<p>Стенд: Панков С. А., НовГУ · Порядок по КИМ 09.02.06-1-2027 · ALT Linux (etcnet) · <a href="index.html">Главная</a></p>
+<p class="noprint"><button type="button" class="linkbtn" onclick="window.print()">Версия для печати</button></p>
+</footer>
+</main>
+</div>
+<a class="top" href="#" aria-label="Наверх">↑</a>
+<dialog class="params" id="params" aria-labelledby="ptitle">
+<form method="dialog" class="pform" novalidate>
+<div class="phead"><h2 id="ptitle">Параметры сети</h2><button type="button" class="x" data-close aria-label="Закрыть">×</button></div>
+<p class="pnote">Измените значения и нажмите «Пересобрать команды» — подставятся во все блоки, таблицы и схему. Параметры общие для всех модулей.</p>
+<div class="pbody" data-pbody></div>
+<div class="pmsg" data-pmsg aria-live="polite"></div>
+<div class="pfoot">
+<button type="button" class="primary" data-apply>Пересобрать команды</button>
+<button type="button" data-preset>Маски по КИМ</button>
+<button type="button" data-defaults>Значения стенда</button>
+<button type="button" data-export>Экспорт</button>
+<label class="filebtn">Импорт<input type="file" accept=".json,application/json" data-import hidden></label>
+</div>
+</form>
+</dialog>
+<div class="toast" data-toast role="status" aria-live="polite"></div>
+<script src="assets/params.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
