@@ -83,13 +83,12 @@ def ospf(name, rid, nets):
     n = '\n'.join(' network %s area 0' % x for x in nets)
     return ("sed -i 's/^ospfd=no/ospfd=yes/' /etc/frr/daemons\n\ncat > /etc/frr/frr.conf << 'EOF'\nfrr defaults traditional\nhostname %s\nlog syslog informational\n!\ninterface gre1\n ip ospf network point-to-point\n ip ospf authentication message-digest\n ip ospf message-digest-key 1 md5 @PW@\n no ip ospf passive\nexit\n!\nrouter ospf\n ospf router-id %s\n passive-interface default\n%s\nexit\n!\nline vty\n!\nEOF\nsystemctl enable --now frr\nsystemctl restart frr" % (name, rid, n))
 
-def B(devs, title, code, check=False, verified=None, expect=None): return dict(devs=devs, title=title, code=code.strip('\n'), check=check, verified=verified, expect=expect)
+def B(devs, title, code, check=False, expect=None): return dict(devs=devs, title=title, code=code.strip('\n'), check=check, expect=expect)
 def S(id, num, title, exam, desc, blocks): return dict(id=id, num=num, title=title, exam=exam, desc=desc, blocks=blocks)
 
 MG = [('ISP', 'MG_ISP'), ('HQ-RTR', 'MG_HQRTR'), ('HQ-SRV', 'MG_HQSRV'), ('HQ-CLI', 'MG_HQCLI'), ('BR-RTR', 'MG_BRRTR'), ('BR-SRV', 'MG_BRSRV')]
 SOA = "@   IN SOA @H_HQSRV@. root.@DOMAIN@. ( 2027010101 12H 1H 1W 1H )\n    IN NS  @H_HQSRV@."
 
-L4, L5, L7, L8, L9 = 'занятие №4', 'занятие №5', 'занятие №7', 'занятие №8', 'занятие №9'
 M1 = [
  S('prep', '0', 'Подготовка стенда', 'вне КИМ',
    'Выполняется до заданий экзамена. Сеть управления вводится вручную в консоли VirtualBox, дальше подключайтесь с хоста по SSH (<code>ssh user@192.168.56.X</code>, затем <code>su -</code>) и вставляйте блоки целиком.',
@@ -122,7 +121,7 @@ ssh-keygen -lf /etc/openssh/ssh_host_ed25519_key.pub""", expect='отпечат�
  S('t2', '2', 'Доступ в Интернет на ISP', 'Задание 2',
    'Внешний интерфейс получает адрес по DHCP от NAT VirtualBox (маршрут по умолчанию и DNS приходят оттуда же). Для HQ-RTR и BR-RTR — динамическая трансляция (masquerade).',
    [B(['ISP'], 'Интерфейсы и форвардинг', "mkdir -p /etc/net/ifaces/@ISP_WAN@\nprintf 'TYPE=eth\\nBOOTPROTO=dhcp\\nDISABLED=no\\nCONFIG_IPV4=yes\\n' > /etc/net/ifaces/@ISP_WAN@/options\n\n" + eth('@ISP_HQ_IF@') + "echo '@ISP_HQ@' > /etc/net/ifaces/@ISP_HQ_IF@/ipv4address\n\n" + eth('@ISP_BR_IF@') + "echo '@ISP_BR@' > /etc/net/ifaces/@ISP_BR_IF@/ipv4address\n\n" + FWD + 'systemctl restart network\nip -br a'),
-    B(['ISP'], 'NAT в сторону Интернета', nft('@ISP_WAN@'), verified=L7),
+    B(['ISP'], 'NAT в сторону Интернета', nft('@ISP_WAN@')),
    ]),
  S('t3', '3', 'Локальные учётные записи', 'Задание 3',
    'sshuser на серверах, net_admin на маршрутизаторах, sudo без пароля.',
@@ -133,9 +132,9 @@ ssh-keygen -lf /etc/openssh/ssh_host_ed25519_key.pub""", expect='отпечат�
    ]),
  S('t4', '4', 'Коммутация в сегменте HQ (VLAN)', 'Задание 4',
    'Router-on-a-stick: все VLAN маршрутизируются через один адаптер HQ-RTR (внутренняя сеть lab-core). HQ-SRV и HQ-CLI тегируют трафик сами.',
-   [B(['HQ-RTR'], 'Trunk + VLAN @V_SRV@ / @V_CLI@ / @V_MGMT@', MOD + trunk('@HQ_LAN_IF@') + vlan('@HQ_LAN_IF@', '@V_SRV@') + vlan('@HQ_LAN_IF@', '@V_CLI@') + vlan('@HQ_LAN_IF@', '@V_MGMT@') + "echo '@HQ_GW_SRV@'  > /etc/net/ifaces/@HQ_LAN_IF@.@V_SRV@/ipv4address\necho '@HQ_GW_CLI@'  > /etc/net/ifaces/@HQ_LAN_IF@.@V_CLI@/ipv4address\necho '@HQ_GW_MGMT@' > /etc/net/ifaces/@HQ_LAN_IF@.@V_MGMT@/ipv4address\nsystemctl restart network\nip -br a", verified=L5),
-    B(['HQ-SRV'], 'VLAN @V_SRV@', MOD + trunk('@HQ_SRV_IF@') + vlan('@HQ_SRV_IF@', '@V_SRV@') + "echo '@HQ_SRV_CIDR@' > /etc/net/ifaces/@HQ_SRV_IF@.@V_SRV@/ipv4address\necho 'default via @HQ_GW_SRV_IP@' > /etc/net/ifaces/@HQ_SRV_IF@.@V_SRV@/ipv4route\nsystemctl restart network\nping -c3 @HQ_GW_SRV_IP@", verified=L5),
-    B(['HQ-CLI'], 'VLAN @V_CLI@ (статикой, до задания 9)', MOD + trunk('@HQ_CLI_IF@') + vlan('@HQ_CLI_IF@', '@V_CLI@', 'static', 'NM_CONTROLLED=no\n') + "echo '@HQ_CLI_CIDR@' > /etc/net/ifaces/@HQ_CLI_IF@.@V_CLI@/ipv4address\necho 'default via @HQ_GW_CLI_IP@' > /etc/net/ifaces/@HQ_CLI_IF@.@V_CLI@/ipv4route\nsystemctl restart network\nping -c3 @HQ_GW_CLI_IP@", verified=L5),
+   [B(['HQ-RTR'], 'Trunk + VLAN @V_SRV@ / @V_CLI@ / @V_MGMT@', MOD + trunk('@HQ_LAN_IF@') + vlan('@HQ_LAN_IF@', '@V_SRV@') + vlan('@HQ_LAN_IF@', '@V_CLI@') + vlan('@HQ_LAN_IF@', '@V_MGMT@') + "echo '@HQ_GW_SRV@'  > /etc/net/ifaces/@HQ_LAN_IF@.@V_SRV@/ipv4address\necho '@HQ_GW_CLI@'  > /etc/net/ifaces/@HQ_LAN_IF@.@V_CLI@/ipv4address\necho '@HQ_GW_MGMT@' > /etc/net/ifaces/@HQ_LAN_IF@.@V_MGMT@/ipv4address\nsystemctl restart network\nip -br a"),
+    B(['HQ-SRV'], 'VLAN @V_SRV@', MOD + trunk('@HQ_SRV_IF@') + vlan('@HQ_SRV_IF@', '@V_SRV@') + "echo '@HQ_SRV_CIDR@' > /etc/net/ifaces/@HQ_SRV_IF@.@V_SRV@/ipv4address\necho 'default via @HQ_GW_SRV_IP@' > /etc/net/ifaces/@HQ_SRV_IF@.@V_SRV@/ipv4route\nsystemctl restart network\nping -c3 @HQ_GW_SRV_IP@"),
+    B(['HQ-CLI'], 'VLAN @V_CLI@ (статикой, до задания 9)', MOD + trunk('@HQ_CLI_IF@') + vlan('@HQ_CLI_IF@', '@V_CLI@', 'static', 'NM_CONTROLLED=no\n') + "echo '@HQ_CLI_CIDR@' > /etc/net/ifaces/@HQ_CLI_IF@.@V_CLI@/ipv4address\necho 'default via @HQ_GW_CLI_IP@' > /etc/net/ifaces/@HQ_CLI_IF@.@V_CLI@/ipv4route\nsystemctl restart network\nping -c3 @HQ_GW_CLI_IP@"),
    ]),
  S('t5', '5', 'Безопасный удалённый доступ (SSH)', 'Задание 5',
    'Порт, только sshuser, 2 попытки входа, баннер. После этого на серверы заходите так: <code>ssh -p @SSH_PORT@ sshuser@&lt;адрес&gt;</code>, затем <code>sudo -i</code>.',
@@ -144,21 +143,21 @@ ssh-keygen -lf /etc/openssh/ssh_host_ed25519_key.pub""", expect='отпечат�
       expect='перед паролем — «@BANNER@»; вход sshuser — есть; root — Permission denied'),
    ]),
  S('t6', '6', 'IP-туннель GRE', 'Задание 6', 'Минимальная маска для двух адресов туннеля — /30.',
-   [B(['HQ-RTR'], 'gre1 → BR-RTR', gre('@HQ_WAN_IP@', '@BR_WAN_IP@', '@HQ_WAN_IF@', '@GRE_HQ@'), verified=L8),
-    B(['BR-RTR'], 'gre1 → HQ-RTR', gre('@BR_WAN_IP@', '@HQ_WAN_IP@', '@BR_WAN_IF@', '@GRE_BR_CIDR@'), verified=L8),
-    B(['HQ-RTR'], 'Проверка', 'ping -c3 @GRE_BR@', check=True, verified=L8, expect='3 packets transmitted, 3 received, 0% packet loss'),
+   [B(['HQ-RTR'], 'gre1 → BR-RTR', gre('@HQ_WAN_IP@', '@BR_WAN_IP@', '@HQ_WAN_IF@', '@GRE_HQ@')),
+    B(['BR-RTR'], 'gre1 → HQ-RTR', gre('@BR_WAN_IP@', '@HQ_WAN_IP@', '@BR_WAN_IF@', '@GRE_BR_CIDR@')),
+    B(['HQ-RTR'], 'Проверка', 'ping -c3 @GRE_BR@', check=True, expect='3 packets transmitted, 3 received, 0% packet loss'),
    ]),
  S('t7', '7', 'Динамическая маршрутизация OSPF', 'Задание 7',
    'FRR, area 0. Все интерфейсы пассивны, OSPF работает только на gre1. Аутентификация MD5.',
    [B(['HQ-RTR'], 'FRR / ospfd', ospf('@H_HQRTR@', '@GRE_HQ_IP@', ['@HQ_GW_SRV_SUBNET@', '@HQ_GW_CLI_SUBNET@', '@HQ_GW_MGMT_SUBNET@', '@GRE_HQ_SUBNET@'])),
     B(['BR-RTR'], 'FRR / ospfd', ospf('@H_BRRTR@', '@GRE_BR@', ['@BR_GW_SRV_SUBNET@', '@BR_GW_MGMT_SUBNET@', '@GRE_HQ_SUBNET@'])),
-    B(['HQ-RTR', 'BR-RTR'], 'Проверка: сосед в состоянии Full', "vtysh -c 'show ip ospf neighbor'\nvtysh -c 'show ip route ospf'", check=True, verified=L8, expect='сосед в состоянии Full/-, интерфейс gre1; маршруты O>* до сетей другого офиса'),
+    B(['HQ-RTR', 'BR-RTR'], 'Проверка: сосед в состоянии Full', "vtysh -c 'show ip ospf neighbor'\nvtysh -c 'show ip route ospf'", check=True, expect='сосед в состоянии Full/-, интерфейс gre1; маршруты O>* до сетей другого офиса'),
    ]),
  S('t8', '8', 'Динамическая трансляция адресов (NAT)', 'Задание 8',
    'Masquerade в сторону ISP. Трафик между офисами идёт через gre1 и не транслируется.',
-   [B(['HQ-RTR'], 'NAT → ISP (@HQ_WAN_IF@)', nft('@HQ_WAN_IF@'), verified=L8),
-    B(['BR-RTR'], 'NAT → ISP (@BR_WAN_IF@)', nft('@BR_WAN_IF@'), verified=L8),
-    B(['HQ-SRV', 'BR-SRV'], 'Проверка', 'ping -c3 77.88.8.8', check=True, verified=L8, expect='0% packet loss'),
+   [B(['HQ-RTR'], 'NAT → ISP (@HQ_WAN_IF@)', nft('@HQ_WAN_IF@')),
+    B(['BR-RTR'], 'NAT → ISP (@BR_WAN_IF@)', nft('@BR_WAN_IF@')),
+    B(['HQ-SRV', 'BR-SRV'], 'Проверка', 'ping -c3 77.88.8.8', check=True, expect='0% packet loss'),
    ]),
  S('t9', '9', 'DHCP для HQ-CLI', 'Задание 9',
    'Сервер — HQ-RTR, только на VLAN клиентов. Адрес маршрутизатора исключён из пула; HQ-CLI получает зарезервированный адрес по MAC.',
@@ -191,7 +190,7 @@ EOF
 systemctl daemon-reload
 systemctl enable --now dhcpd
 systemctl restart dhcpd
-systemctl status dhcpd --no-pager""", verified=L9),
+systemctl status dhcpd --no-pager"""),
     B(['HQ-CLI'], 'Перевести VLAN @V_CLI@ на DHCP', vlan('@HQ_CLI_IF@', '@V_CLI@', 'dhcp', 'NM_CONTROLLED=no\n') + "rm -f /etc/net/ifaces/@HQ_CLI_IF@.@V_CLI@/ipv4address /etc/net/ifaces/@HQ_CLI_IF@.@V_CLI@/ipv4route\nsystemctl restart network\nip -br a show @HQ_CLI_IF@.@V_CLI@\ncat /etc/resolv.conf"),
     B(['HQ-CLI'], 'Проверка', "ip -br a show @HQ_CLI_IF@.@V_CLI@\nip route | grep default\ngrep nameserver /etc/resolv.conf", check=True,
       expect='@HQ_CLI_IP@ (резерв по MAC), default via @HQ_GW_CLI_IP@, один nameserver @HQ_SRV_IP@ — без посторонних DNS вроде 1.1.1.1'),
@@ -264,7 +263,7 @@ chown named:named /var/lib/bind/zone/*
 chmod 640 /var/lib/bind/zone/*
 named-checkzone @DOMAIN@ /var/lib/bind/zone/@DOMAIN@.zone
 named-checkzone @REV_HQ@ /var/lib/bind/zone/@REV_HQ_FILE@
-named-checkzone @REV_BR@ /var/lib/bind/zone/@REV_BR_FILE@""", verified=L9),
+named-checkzone @REV_BR@ /var/lib/bind/zone/@REV_BR_FILE@"""),
     B(['HQ-SRV'], 'Запуск и локальный резолвер', """sed -i 's|^#\\?CHROOT=.*|CHROOT="-t /var/lib/bind"|' /etc/sysconfig/bind
 grep CHROOT /etc/sysconfig/bind
 systemctl enable --now bind
@@ -272,12 +271,12 @@ systemctl restart bind
 
 printf 'search @DOMAIN@\\nnameserver 127.0.0.1\\n' > /etc/net/ifaces/@HQ_SRV_IF@.@V_SRV@/resolv.conf
 systemctl restart network"""),
-    B(['HQ-SRV', 'HQ-CLI'], 'Проверка', 'dig @@HQ_SRV_IP@ @H_HQRTR@ +short\ndig @@HQ_SRV_IP@ @H_BRSRV@ +short\ndig @@HQ_SRV_IP@ -x @HQ_SRV_IP@ +short\ndig @@HQ_SRV_IP@ -x @BR_SRV_IP@ +short\ndig @@HQ_SRV_IP@ ya.ru +short', check=True, verified=L9, expect='@HQ_GW_MGMT_IP@, @BR_SRV_IP@, @H_HQSRV@., @H_BRSRV@., адреса ya.ru'),
+    B(['HQ-SRV', 'HQ-CLI'], 'Проверка', 'dig @@HQ_SRV_IP@ @H_HQRTR@ +short\ndig @@HQ_SRV_IP@ @H_BRSRV@ +short\ndig @@HQ_SRV_IP@ -x @HQ_SRV_IP@ +short\ndig @@HQ_SRV_IP@ -x @BR_SRV_IP@ +short\ndig @@HQ_SRV_IP@ ya.ru +short', check=True, expect='@HQ_GW_MGMT_IP@, @BR_SRV_IP@, @H_HQSRV@., @H_BRSRV@., адреса ya.ru'),
    ]),
  S('t11', '11', 'Часовой пояс', 'Задание 11', 'На всех устройствах — по месту проведения экзамена.',
    [B(['Все ВМ'], 'Часовой пояс', 'timedatectl set-timezone @TZ@\ntimedatectl')]),
  S('check', '✓', 'Итоговая проверка', 'вне КИМ', 'Быстрый прогон перед сдачей.',
-   [B(['HQ-CLI'], 'Связность, DNS, SSH', 'ip -br a\nip route\nping -c2 @HQ_GW_CLI_IP@\nping -c2 @HQ_SRV_IP@\nping -c2 @BR_SRV_IP@\nping -c2 77.88.8.8\nhost @H_HQSRV@\nhost ya.ru\nssh -p @SSH_PORT@ sshuser@@H_HQSRV@', check=True, verified=L4),
+   [B(['HQ-CLI'], 'Связность, DNS, SSH', 'ip -br a\nip route\nping -c2 @HQ_GW_CLI_IP@\nping -c2 @HQ_SRV_IP@\nping -c2 @BR_SRV_IP@\nping -c2 77.88.8.8\nhost @H_HQSRV@\nhost ya.ru\nssh -p @SSH_PORT@ sshuser@@H_HQSRV@', check=True),
     B(['HQ-RTR', 'BR-RTR'], 'Маршрутизация и NAT', "ip -br a\nvtysh -c 'show ip ospf neighbor'\nvtysh -c 'show ip route'\nnft list ruleset\nsystemctl is-active frr nftables", check=True),
     B(['Все ВМ'], 'Один маршрут по умолчанию', "ip route | grep '^default'\nip route | grep -c '^default'", check=True,
       expect='ровно 1; два default (через @MG_IF@ и через офис) — типовая потеря баллов'),
@@ -287,7 +286,6 @@ systemctl restart network"""),
 ISO = "mkdir -p @ISO_DIR@\n# содержимое Additional.iso; если каталог пуст — монтируем диск\n[ -n \"$(ls -A @ISO_DIR@ 2>/dev/null)\" ] || mount @ISO_DEV@ @ISO_DIR@\n"
 def chrony_client(ip):
     return "apt-get install -y chrony\nsed -i -E '/^(pool|server) /d' /etc/chrony.conf\necho 'server %s iburst' >> /etc/chrony.conf\nsystemctl enable --now chronyd\nsystemctl restart chronyd\nchronyc sources" % ip
-L10, L11, L12 = 'занятие №10', 'занятие №11', 'занятие №12'
 M2 = [
  S('m2t1', '1', 'Контроллер домена Samba DC', 'Задание 1',
    'Домен поднимается на BR-SRV с внутренним DNS Samba. HQ-CLI по-прежнему использует DNS HQ-SRV, поэтому на HQ-SRV добавляются SRV-записи, указывающие на контроллер. HQ-CLI вводится в домен через winbind; входить могут только члены группы <code>hq</code>, домашний каталог создаётся автоматически. Kerberos чувствителен ко времени: при ошибке <code>Clock skew</code> сначала выполните задание 4.',
@@ -339,7 +337,7 @@ host -t SRV _ldap._tcp.@DOMAIN@
 system-auth write ad @DOMAIN@ hq-cli @WG@ 'administrator' '@PW@'
 reboot
 # после перезагрузки:
-# net ads testjoin && wbinfo -u | head""", verified=L10),
+# net ads testjoin && wbinfo -u | head"""),
     B(['HQ-CLI'], 'Вход только для группы hq, sudo: cat, grep, id', """# SID группы надёжнее имени
 SID=$(wbinfo --name-to-sid hq | awk '{print $1}')
 echo "$SID"
@@ -360,12 +358,12 @@ testparm -s >/dev/null && systemctl restart winbind
 control sudo public
 echo '%hq ALL=(ALL) NOPASSWD: /bin/cat, /bin/grep, /usr/bin/id' > /etc/sudoers.d/hq
 chmod 400 /etc/sudoers.d/hq
-visudo -c""", verified=L10),
+visudo -c"""),
     B(['HQ-CLI'], 'Проверка', """wbinfo --name-to-sid hq
 id hquser1
 sudo -l -U hquser1
 # войдите hquser1 / @HQ_USER_PW@1 через экран входа, затем в терминале:
-# pwd; sudo cat /etc/hostname; sudo vi /etc/hosts""", check=True, verified=L10,
+# pwd; sudo cat /etc/hostname; sudo vi /etc/hosts""", check=True,
       expect="pwd → /home/@REALM@/hquser1 (создан автоматически)\nsudo cat — работает; sudo vi — «is not allowed to execute»\nпользователь не из hq — Authentication failure"),
    ]),
  S('m2t2', '2', 'Файловое хранилище RAID 0', 'Задание 2',
@@ -380,8 +378,8 @@ mkdir -p /raid
 grep -q ' /raid ' /etc/fstab || printf 'UUID=%s /raid ext4 defaults,nofail 0 0\\n' "$(blkid -s UUID -o value /dev/md0)" >> /etc/fstab
 systemctl daemon-reload && mount -a
 cat /proc/mdstat
-df -h /raid""", verified=L11),
-    B(['HQ-SRV'], 'Проверка после перезагрузки', "cat /proc/mdstat\ndf -h /raid\ngrep -E 'md0|/raid' /etc/mdadm.conf /etc/fstab", check=True, verified=L11,
+df -h /raid"""),
+    B(['HQ-SRV'], 'Проверка после перезагрузки', "cat /proc/mdstat\ndf -h /raid\ngrep -E 'md0|/raid' /etc/mdadm.conf /etc/fstab", check=True,
       expect="md0 : active raid0 …; /dev/md0 смонтирован в /raid (≈ сумма дисков)"),
    ]),
  S('m2t3', '3', 'Сервер NFS', 'Задание 3',
@@ -392,14 +390,14 @@ chmod 777 /raid/nfs
 grep -q '^/raid/nfs ' /etc/exports || echo '/raid/nfs @HQ_GW_CLI_SUBNET@(rw,sync,no_subtree_check)' >> /etc/exports
 systemctl enable --now nfs-server
 exportfs -rav
-showmount -e localhost""", verified=L11),
+showmount -e localhost"""),
     B(['HQ-CLI'], 'Автомонтирование', """apt-get install -y nfs-clients nfs-utils
 showmount -e @HQ_SRV_IP@
 mkdir -p /mnt/nfs
 grep -q ' /mnt/nfs ' /etc/fstab || echo '@HQ_SRV_IP@:/raid/nfs /mnt/nfs nfs defaults,_netdev,x-systemd.automount 0 0' >> /etc/fstab
 systemctl daemon-reload && mount -a
-touch /mnt/nfs/probe && ls -l /mnt/nfs""", verified=L11),
-    B(['HQ-SRV'], 'Проверка', 'ls -l /raid/nfs\nexportfs -v', check=True, verified=L11,
+touch /mnt/nfs/probe && ls -l /mnt/nfs"""),
+    B(['HQ-SRV'], 'Проверка', 'ls -l /raid/nfs\nexportfs -v', check=True,
       expect="файл probe, созданный на HQ-CLI; /raid/nfs  @HQ_GW_CLI_SUBNET@(rw,…)"),
    ]),
  S('m2t4', '4', 'Служба времени chrony', 'Задание 4',
@@ -416,7 +414,7 @@ rtcsync
 EOF
 systemctl enable --now chronyd
 systemctl restart chronyd
-chronyc tracking | grep -i stratum""", verified=L10, expect="Stratum         : 5"),
+chronyc tracking | grep -i stratum""", expect="Stratum         : 5"),
     B(['HQ-RTR', 'HQ-SRV', 'HQ-CLI'], 'Клиент (офис HQ)', chrony_client('@ISP_HQ_IP@')),
     B(['BR-RTR', 'BR-SRV'], 'Клиент (офис BR)', chrony_client('@ISP_BR_IP@')),
     B(['ISP'], 'Проверка: клиенты видны на ISP', 'chronyc clients\nchronyc tracking | grep -i stratum', check=True,
@@ -425,7 +423,7 @@ chronyc tracking | grep -i stratum""", verified=L10, expect="Stratum         : 5
  S('m2t5', '5', 'Ansible на BR-SRV', 'Задание 5',
    'Ключи раскладываются <code>ssh-copy-id</code> по паролю, после этого <code>ansible all -m ping</code> отвечает pong без предупреждений. Порт SSH: HQ-SRV — @SSH_PORT@, HQ-CLI и маршрутизаторы — @ANS_PORT@.',
    [B(['HQ-CLI'], 'sshd и пользователь для Ansible', "apt-get install -y openssh-server python3\nid sshuser >/dev/null 2>&1 || useradd -m sshuser\necho 'sshuser:@PW@' | chpasswd\nsystemctl enable --now sshd"),
-    B(['HQ-SRV', 'HQ-RTR', 'BR-RTR'], 'Python на управляемых машинах', 'apt-get install -y python3', verified=L11),
+    B(['HQ-SRV', 'HQ-RTR', 'BR-RTR'], 'Python на управляемых машинах', 'apt-get install -y python3'),
     B(['BR-SRV'], 'Ключи SSH', """apt-get install -y ansible openssh-clients
 [ -f /root/.ssh/id_ed25519 ] || ssh-keygen -t ed25519 -N '' -f /root/.ssh/id_ed25519
 # MaxAuthTries 2: при «Too many authentication failures» помогает PreferredAuthentications=password
@@ -433,7 +431,7 @@ O='-o StrictHostKeyChecking=accept-new -o PreferredAuthentications=password'
 ssh-copy-id $O -p @SSH_PORT@ sshuser@@HQ_SRV_IP@
 ssh-copy-id $O -p @ANS_PORT@ sshuser@@HQ_CLI_IP@
 ssh-copy-id $O -p @ANS_PORT@ net_admin@@HQ_GW_MGMT_IP@
-ssh-copy-id $O -p @ANS_PORT@ net_admin@@BR_GW_MGMT_IP@""", verified=L11),
+ssh-copy-id $O -p @ANS_PORT@ net_admin@@BR_GW_MGMT_IP@"""),
     B(['BR-SRV'], 'Инвентарь и конфигурация', """mkdir -p /etc/ansible
 cat > /etc/ansible/hosts << 'EOF'
 [hq]
@@ -454,8 +452,8 @@ host_key_checking = False
 deprecation_warnings = False
 interpreter_python = /usr/bin/python3
 EOF
-cd /etc/ansible && ansible all -m ping""", verified=L11),
-    B(['BR-SRV'], 'Проверка', 'ansible all -m ping', check=True, verified=L11,
+cd /etc/ansible && ansible all -m ping"""),
+    B(['BR-SRV'], 'Проверка', 'ansible all -m ping', check=True,
       expect='4 × SUCCESS … "ping": "pong", без WARNING'),
    ]),
  S('m2t6', '6', 'Веб-приложение в Docker', 'Задание 6',
@@ -471,8 +469,8 @@ cd /root/testapp
 grep -q container_name compose.yaml || sed -i -E 's/^  (testapp|db):[[:space:]]*$/&\\n    container_name: \\1/' compose.yaml
 grep -nE 'image|container_name|ports|restart|- "' compose.yaml
 docker compose config -q && docker compose up -d
-docker ps --format 'table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}'""", verified=L12),
-    B(['BR-SRV'], 'Проверка', "docker ps --format '{{.Names}} {{.Status}}'\ncurl -s -o /dev/null -w '%{http_code}\\n' http://@BR_SRV_IP@:@APP_PORT@", check=True, verified=L12,
+docker ps --format 'table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}'"""),
+    B(['BR-SRV'], 'Проверка', "docker ps --format '{{.Names}} {{.Status}}'\ncurl -s -o /dev/null -w '%{http_code}\\n' http://@BR_SRV_IP@:@APP_PORT@", check=True,
       expect="testapp Up …, db Up …; код 200"),
    ]),
  S('m2t7', '7', 'Веб-приложение на Apache', 'Задание 7',
@@ -486,7 +484,7 @@ GRANT ALL PRIVILEGES ON webdb.* TO 'web'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 mariadb webdb < @ISO_DIR@/web/dump.sql
-mariadb -u web -p'@PW@' -e 'SHOW TABLES' webdb""", verified=L12),
+mariadb -u web -p'@PW@' -e 'SHOW TABLES' webdb"""),
     B(['HQ-SRV'], 'Файлы сайта и запуск', """rm -f /var/www/html/index.html
 cp @ISO_DIR@/web/index.php @ISO_DIR@/web/logo.png /var/www/html/
 sed -i -E \\
@@ -497,8 +495,8 @@ sed -i -E \\
 sed -n '2,7p' /var/www/html/index.php
 systemctl enable --now httpd2
 systemctl restart httpd2
-curl -s http://127.0.0.1:@WEB_PORT@/ | head -20""", verified=L12),
-    B(['HQ-SRV'], 'Проверка после перезагрузки', "systemctl is-active mysqld httpd2\ncurl -s -o /dev/null -w '%{http_code}\\n' http://@HQ_SRV_IP@:@WEB_PORT@/", check=True, verified=L12,
+curl -s http://127.0.0.1:@WEB_PORT@/ | head -20"""),
+    B(['HQ-SRV'], 'Проверка после перезагрузки', "systemctl is-active mysqld httpd2\ncurl -s -o /dev/null -w '%{http_code}\\n' http://@HQ_SRV_IP@:@WEB_PORT@/", check=True,
       expect="active, active; код 200, в HTML — строки таблицы из dump.sql"),
     B(['HQ-SRV'], 'Если MariaDB не запускается (ibdata1 повреждён)', """# симптом в /var/lib/mysql/log/mysqld.log: Header page consists of zero bytes in datafile: ./ibdata1
 # причина — жёсткое выключение ВМ; данные пересоздаются из dump.sql
@@ -508,22 +506,21 @@ mkdir /var/lib/mysql/db
 chown mysql:mysql /var/lib/mysql/db && chmod 750 /var/lib/mysql/db
 systemctl start mysqld
 systemctl status mysqld --no-pager | head -3
-# затем повторите блок «LAMP и база webdb»""", verified=L12),
+# затем повторите блок «LAMP и база webdb»"""),
    ]),
  S('m2t8', '8', 'Статическая трансляция портов', 'Задание 8',
    'Таблица nftables из задания 8 Модуля 1 дополняется цепочкой prerouting (DNAT), файл <code>/etc/nftables/nftables.nft</code> перезаписывается целиком. Условие <code>ip daddr</code> вместо <code>iifname</code> позволяет проверять проброс и из своего офиса (с HQ-CLI).',
-   [B(['HQ-RTR'], 'DNAT на HQ-SRV', nft('@HQ_WAN_IF@', ['ip daddr @HQ_WAN_IP@ tcp dport @EXT_PORT@ dnat to @HQ_SRV_IP@:@WEB_PORT@', 'ip daddr @HQ_WAN_IP@ tcp dport @SSH_PORT@ dnat to @HQ_SRV_IP@:@SSH_PORT@']), verified=L12),
-    B(['BR-RTR'], 'DNAT на BR-SRV', nft('@BR_WAN_IF@', ['ip daddr @BR_WAN_IP@ tcp dport @EXT_PORT@ dnat to @BR_SRV_IP@:@APP_PORT@', 'ip daddr @BR_WAN_IP@ tcp dport @SSH_PORT@ dnat to @BR_SRV_IP@:@SSH_PORT@']), verified=L12),
-    B(['ISP'], 'Проверка извне', "curl -s -o /dev/null -w '%{http_code}\\n' http://@HQ_WAN_IP@:@EXT_PORT@\ncurl -s -o /dev/null -w '%{http_code}\\n' http://@BR_WAN_IP@:@EXT_PORT@\nssh -p @SSH_PORT@ sshuser@@HQ_WAN_IP@ hostname\nssh -p @SSH_PORT@ sshuser@@BR_WAN_IP@ hostname", check=True, verified=L12,
+   [B(['HQ-RTR'], 'DNAT на HQ-SRV', nft('@HQ_WAN_IF@', ['ip daddr @HQ_WAN_IP@ tcp dport @EXT_PORT@ dnat to @HQ_SRV_IP@:@WEB_PORT@', 'ip daddr @HQ_WAN_IP@ tcp dport @SSH_PORT@ dnat to @HQ_SRV_IP@:@SSH_PORT@'])),
+    B(['BR-RTR'], 'DNAT на BR-SRV', nft('@BR_WAN_IF@', ['ip daddr @BR_WAN_IP@ tcp dport @EXT_PORT@ dnat to @BR_SRV_IP@:@APP_PORT@', 'ip daddr @BR_WAN_IP@ tcp dport @SSH_PORT@ dnat to @BR_SRV_IP@:@SSH_PORT@'])),
+    B(['ISP'], 'Проверка извне', "curl -s -o /dev/null -w '%{http_code}\\n' http://@HQ_WAN_IP@:@EXT_PORT@\ncurl -s -o /dev/null -w '%{http_code}\\n' http://@BR_WAN_IP@:@EXT_PORT@\nssh -p @SSH_PORT@ sshuser@@HQ_WAN_IP@ hostname\nssh -p @SSH_PORT@ sshuser@@BR_WAN_IP@ hostname", check=True,
       expect="200, 200, @H_HQSRV@, @H_BRSRV@"),
-    B(['HQ-CLI'], 'Проверка из офиса HQ', "curl -s -o /dev/null -w '%{http_code}\\n' http://@HQ_WAN_IP@:@EXT_PORT@\ncurl -s -o /dev/null -w '%{http_code}\\n' http://@BR_WAN_IP@:@EXT_PORT@", check=True, verified=L12,
+    B(['HQ-CLI'], 'Проверка из офиса HQ', "curl -s -o /dev/null -w '%{http_code}\\n' http://@HQ_WAN_IP@:@EXT_PORT@\ncurl -s -o /dev/null -w '%{http_code}\\n' http://@BR_WAN_IP@:@EXT_PORT@", check=True,
       expect="200, 200 (при iifname первая проверка не проходила бы)"),
    ]),
  S('m2t9', '9', 'Яндекс Браузер на HQ-CLI', 'Задание 9', 'Пакет есть в репозитории ALT; другой вариант — «Центр приложений». Для отчёта нужен скриншот запущенного окна.',
-   [B(['HQ-CLI'], 'Установка', 'apt-get update && apt-get install -y yandex-browser-stable\nyandex-browser-stable --version', verified=L12, expect="Yandex Browser 25.x")]),
+   [B(['HQ-CLI'], 'Установка', 'apt-get update && apt-get install -y yandex-browser-stable\nyandex-browser-stable --version', expect="Yandex Browser 25.x")]),
 ]
 
-L13, L14, L15 = 'занятие №13', 'занятие №14', 'занятие №15'
 CERTS = '/home/sshuser/certs'
 def revproxy(tls):
     """Конфигурация nginx на ISP: web — через HQ-RTR (DNAT на HQ-SRV), docker — через BR-RTR (DNAT на BR-SRV)."""
@@ -552,19 +549,19 @@ cd /root/import
 # CRLF → LF, иначе «неожиданный маркер done»
 sed -i 's/\\r$//' import.sh users.csv
 chmod +x import.sh
-bash import.sh users.csv""", verified=L13),
-    B(['BR-SRV'], 'Проверка', "samba-tool user list | wc -l\nsamba-tool ou list\nsamba-tool user list | sort | head", check=True, verified=L13,
+bash import.sh users.csv"""),
+    B(['BR-SRV'], 'Проверка', "samba-tool user list | wc -l\nsamba-tool ou list\nsamba-tool user list | sort | head", check=True,
       expect='сотни пользователей (на стенде — 305 вместе со служебными и hquser), OU CloudStorage, IT, Manager, Overal, Supporter'),
    ]),
  S('m3t2', '2', 'Обратный прокси-сервер на ISP', 'Задание 2',
    'Nginx на ISP принимает запросы к <code>web.@DOMAIN@</code> и <code>docker.@DOMAIN@</code> (обе записи в DNS HQ-SRV указывают на ISP). ISP не знает внутренних сетей офисов, поэтому запросы уходят на внешние адреса маршрутизаторов и дальше по DNAT из задания 8 Модуля 2. В ALT конфигурации лежат в <code>sites-available.d</code> / <code>sites-enabled.d</code>.',
-   [B(['ISP'], 'Nginx как reverse proxy', "apt-get update && apt-get install -y nginx\nsystemctl enable --now nginx\n\n" + REV_HTTP, verified=L13),
-    B(['ISP'], 'Проверка', "curl -s -H 'Host: web.@DOMAIN@' http://127.0.0.1/ | grep -i '<title>'\ncurl -s -H 'Host: docker.@DOMAIN@' http://127.0.0.1/ | grep -i '<title>'", check=True, verified=L13,
+   [B(['ISP'], 'Nginx как reverse proxy', "apt-get update && apt-get install -y nginx\nsystemctl enable --now nginx\n\n" + REV_HTTP),
+    B(['ISP'], 'Проверка', "curl -s -H 'Host: web.@DOMAIN@' http://127.0.0.1/ | grep -i '<title>'\ncurl -s -H 'Host: docker.@DOMAIN@' http://127.0.0.1/ | grep -i '<title>'", check=True,
       expect='<title> сайта Apache с HQ-SRV и <title> testapp с BR-SRV («Все студенты»)'),
    ]),
  S('m3t3', '3', 'Web-аутентификация на ISP', 'Задание 3',
    'Basic Auth в nginx только для <code>web.@DOMAIN@</code>: пользователь <code>@WEB_USER@</code>, пароль <code>@PW@</code>. Утилита <code>htpasswd</code> в ALT — пакет <code>apache2-htpasswd</code>. Файл пересобирается целиком, поэтому блок можно выполнять повторно.',
-   [B(['ISP'], 'Файл паролей и auth_basic', "apt-get install -y apache2-htpasswd\n# -b — пароль в команде; без -b htpasswd спросит его дважды\nhtpasswd -cb /etc/nginx/.htpasswd @WEB_USER@ '@PW@'\n\n" + REV_AUTH, verified=L13),
+   [B(['ISP'], 'Файл паролей и auth_basic', "apt-get install -y apache2-htpasswd\n# -b — пароль в команде; без -b htpasswd спросит его дважды\nhtpasswd -cb /etc/nginx/.htpasswd @WEB_USER@ '@PW@'\n\n" + REV_AUTH),
     B(['ISP'], 'Проверка', "curl -s -o /dev/null -w '%{http_code}\\n' -H 'Host: web.@DOMAIN@' http://127.0.0.1/\ncurl -s -o /dev/null -w '%{http_code}\\n' -u '@WEB_USER@:@PW@' -H 'Host: web.@DOMAIN@' http://127.0.0.1/", check=True,
       expect='401 без пароля, 200 с паролем'),
    ]),
@@ -584,7 +581,7 @@ for n in web docker; do
     -out $n.crt -days @CA_DAYS@ -sha256 -extfile $n.ext
 done
 openssl x509 -in web.crt -noout -subject -issuer -dates -ext subjectAltName
-openssl verify -CAfile ca.crt web.crt docker.crt""", verified=L14,
+openssl verify -CAfile ca.crt web.crt docker.crt""",
       expect='web.crt: OK, docker.crt: OK; notAfter — через @CA_DAYS@ дней'),
     B(['HQ-SRV'], 'Выложить файлы для ISP и HQ-CLI', """install -d -o sshuser -g sshuser -m 700 @CERTS@
 cp /etc/ssl/ca/{ca.crt,web.crt,web.key,docker.crt,docker.key} @CERTS@/
@@ -596,11 +593,11 @@ scp -P @SSH_PORT@ -o StrictHostKeyChecking=accept-new 'sshuser@@HQ_WAN_IP@:certs
 chown root:root /etc/nginx/ssl/*
 chmod 600 /etc/nginx/ssl/*.key
 
-""" + REV_TLS, verified=L14),
+""" + REV_TLS),
     B(['HQ-CLI'], 'Доверие к ЦС', """scp -P @SSH_PORT@ sshuser@@HQ_SRV_IP@:certs/ca.crt /tmp/ca.crt
 cp /tmp/ca.crt /etc/pki/ca-trust/source/anchors/au-team-ca.crt
 update-ca-trust
-trust list | grep -B3 -A2 '@WG@ CA'""", verified=L14, expect='label: @WG@ CA, trust: anchor, category: authority'),
+trust list | grep -B3 -A2 '@WG@ CA'""", expect='label: @WG@ CA, trust: anchor, category: authority'),
     B(['HQ-CLI'], 'Если браузер не доверяет ЦС (база NSS пользователя)', """# выполнять от имени пользователя, который открывает браузер (не root)
 sudo apt-get install -y nss-utils
 mkdir -p ~/.pki/nssdb
@@ -626,8 +623,8 @@ else
 fi
 cat /etc/default/atop
 systemctl enable --now atop
-systemctl restart atop""", verified=L14),
-    B(['HQ-SRV'], 'Проверка (и после перезагрузки)', "systemctl is-enabled atop\nps -o args= -C atop", check=True, verified=L14,
+systemctl restart atop"""),
+    B(['HQ-SRV'], 'Проверка (и после перезагрузки)', "systemctl is-enabled atop\nps -o args= -C atop", check=True,
       expect='enabled; /usr/bin/atop -w /var/log/atop/atop_ГГГГММДД @ATOP_INT@'),
    ]),
  S('m3t6', '6', 'Принт-сервер CUPS', 'Задание 6',
@@ -641,11 +638,11 @@ sed -i 's/^Listen localhost:631/Port 631/' /etc/cups/cupsd.conf
 systemctl restart cups
 lpstat -p PDF >/dev/null 2>&1 || lpadmin -p PDF -E -v cups-pdf:/ -m CUPS-PDF.ppd -o printer-is-shared=true
 lpadmin -d PDF
-lpstat -t""", verified=L14, expect='предупреждение «Printer drivers are deprecated» не мешает; принтер PDF принимает запросы'),
+lpstat -t""", expect='предупреждение «Printer drivers are deprecated» не мешает; принтер PDF принимает запросы'),
     B(['HQ-CLI'], 'Подключение и принтер по умолчанию', """lpstat -p PDF-Printer >/dev/null 2>&1 || lpadmin -p PDF-Printer -E -v ipp://@H_HQSRV@:631/printers/PDF -m everywhere
 lpadmin -d PDF-Printer
 lpoptions -d PDF-Printer >/dev/null
-lpstat -d -p""", verified=L14, expect='назначение системы по умолчанию: PDF-Printer'),
+lpstat -d -p""", expect='назначение системы по умолчанию: PDF-Printer'),
     B(['HQ-CLI'], 'Проверка: печать в PDF', "echo 'test print' | lp\nlpstat -W completed | tail -2\n# на HQ-SRV: ls -lR /var/spool/cups-pdf/", check=True,
       expect='задание PDF-Printer-N выполнено, на HQ-SRV появился .pdf'),
    ]),
@@ -665,8 +662,8 @@ cat > /etc/ansible/playbook/inventory.yml << 'EOF'
         dest: "/etc/ansible/PC-INFO/{{ inventory_hostname }}.yml"
       delegate_to: localhost
 EOF
-ansible-playbook /etc/ansible/playbook/inventory.yml""", verified=L15),
-    B(['BR-SRV'], 'Проверка', "ls -l /etc/ansible/PC-INFO/\ncat /etc/ansible/PC-INFO/*.yml", check=True, verified=L15,
+ansible-playbook /etc/ansible/playbook/inventory.yml"""),
+    B(['BR-SRV'], 'Проверка', "ls -l /etc/ansible/PC-INFO/\ncat /etc/ansible/PC-INFO/*.yml", check=True,
       expect='hq-cli.yml, hq-srv.yml; hostname: @H_HQCLI@, ip_address: @HQ_CLI_IP@; hostname: @H_HQSRV@, ip_address: @HQ_SRV_IP@'),
    ]),
  S('m3t8', '8', 'Защита SSH: fail2ban', 'Задание 8',
@@ -688,7 +685,7 @@ bantime  = @F2B_BAN@
 EOF
 systemctl enable --now fail2ban
 systemctl restart fail2ban
-fail2ban-client status sshd""", verified=L15),
+fail2ban-client status sshd"""),
     B(['HQ-CLI'], 'Проверка: несколько неверных паролей', "# введите неверный пароль, пока соединение не перестанет устанавливаться\nssh -p @SSH_PORT@ sshuser@@HQ_SRV_IP@\nssh -p @SSH_PORT@ sshuser@@HQ_SRV_IP@", check=True,
       expect='после @F2B_RETRY@ неудач — Connection refused/timeout на @F2B_BAN@ с'),
     B(['HQ-SRV'], 'Проверка: адрес заблокирован', "fail2ban-client status sshd\nnft list ruleset | grep -A3 f2b\n# снять блокировку досрочно:\n# fail2ban-client set sshd unbanip @HQ_CLI_IP@", check=True,
@@ -696,23 +693,23 @@ fail2ban-client status sshd""", verified=L15),
    ]),
  S('m3t9', '9', 'Резервное копирование BorgBackup', 'Задание 9',
    'Аналог «Кибер Бэкап» с защитой от шифровальщиков: HQ-SRV отправляет <code>/etc</code> в репозиторий на HQ-CLI. Ключ HQ-SRV на HQ-CLI ограничен командой <code>borg serve --append-only --restrict-to-path /backup</code>: заражённый HQ-SRV может добавлять архивы, но не удалять и не перезаписывать старые. Репозиторий зашифрован (<code>repokey</code>), копия — ежедневно по таймеру systemd.',
-   [B(['HQ-SRV', 'HQ-CLI'], 'Пакет borg', 'apt-get install -y borg\nborg --version', verified=L15),
+   [B(['HQ-SRV', 'HQ-CLI'], 'Пакет borg', 'apt-get install -y borg\nborg --version'),
     B(['HQ-CLI'], 'Пользователь borguser и каталог /backup', """id borguser >/dev/null 2>&1 || useradd -m -s /bin/bash borguser
 mkdir -p /backup && chown borguser:borguser /backup && chmod 700 /backup
 # если в sshd задан AllowUsers — добавить borguser
 if grep -q '^AllowUsers' /etc/openssh/sshd_config && ! grep -q '^AllowUsers.*borguser' /etc/openssh/sshd_config; then
   sed -i '/^AllowUsers/ s/$/ borguser/' /etc/openssh/sshd_config
   sshd -t && systemctl restart sshd
-fi""", verified=L15),
+fi"""),
     B(['HQ-SRV'], 'Ключ SSH и пароль репозитория', """[ -f /root/.ssh/borg_key ] || ssh-keygen -t ed25519 -N '' -f /root/.ssh/borg_key
 echo '@PW@' > /root/.borg-pass && chmod 600 /root/.borg-pass
-scp -P @ANS_PORT@ /root/.ssh/borg_key.pub sshuser@@HQ_CLI_IP@:/tmp/""", verified=L15),
+scp -P @ANS_PORT@ /root/.ssh/borg_key.pub sshuser@@HQ_CLI_IP@:/tmp/"""),
     B(['HQ-CLI'], 'Ключ только для borg serve --append-only, репозиторий', """mkdir -p /home/borguser/.ssh
 grep -qF "$(cut -d' ' -f2 /tmp/borg_key.pub)" /home/borguser/.ssh/authorized_keys 2>/dev/null || \\
   echo "command=\\"borg serve --append-only --restrict-to-path /backup\\",restrict $(cat /tmp/borg_key.pub)" >> /home/borguser/.ssh/authorized_keys
 chown -R borguser:borguser /home/borguser/.ssh
 chmod 700 /home/borguser/.ssh && chmod 600 /home/borguser/.ssh/authorized_keys
-[ -d /backup/hq-srv ] || sudo -u borguser BORG_PASSPHRASE='@PW@' borg init --encryption=repokey /backup/hq-srv""", verified=L15),
+[ -d /backup/hq-srv ] || sudo -u borguser BORG_PASSPHRASE='@PW@' borg init --encryption=repokey /backup/hq-srv"""),
     B(['HQ-SRV'], 'Скрипт и ежедневный таймер', """cat > /usr/local/bin/backup-etc.sh << 'EOF'
 #!/bin/bash
 export BORG_RSH='ssh -i /root/.ssh/borg_key -p @ANS_PORT@ -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes'
@@ -741,14 +738,14 @@ WantedBy=timers.target
 EOF
 systemctl daemon-reload && systemctl enable --now backup-etc.timer
 /usr/local/bin/backup-etc.sh
-systemctl list-timers backup-etc.timer""", verified=L15),
+systemctl list-timers backup-etc.timer"""),
     B(['HQ-SRV'], 'Проверка: список архивов и восстановление', """export BORG_RSH='ssh -i /root/.ssh/borg_key -p @ANS_PORT@ -o IdentitiesOnly=yes'
 export BORG_PASSCOMMAND='cat /root/.borg-pass'
 R='ssh://borguser@@HQ_CLI_IP@:@ANS_PORT@/backup/hq-srv'
 borg list "$R"
 mkdir -p /tmp/restore && cd /tmp/restore
 borg extract "$R::$(borg list --short "$R" | tail -1)" etc/hostname
-cat /tmp/restore/etc/hostname""", check=True, verified=L15,
+cat /tmp/restore/etc/hostname""", check=True,
       expect='архив etc-ГГГГ-ММ-ДД_ЧЧММ; восстановленный etc/hostname содержит @H_HQSRV@'),
     B(['HQ-CLI'], 'Проверка: ключ HQ-SRV ограничен append-only', "grep -o 'command=\"[^\"]*\"' /home/borguser/.ssh/authorized_keys\nls -ld /backup /backup/hq-srv", check=True,
       expect='command="borg serve --append-only --restrict-to-path /backup"; владелец borguser, права 700 — с HQ-SRV удалить старые архивы нельзя'),
@@ -766,12 +763,11 @@ def render_steps(steps):
         for i, b in enumerate(s['blocks']):
             bid = '%s-%d' % (s['id'], i + 1)
             badges = ''.join('<span class="dev d-%s">%s</span>' % (DEV[d], E(d)) for d in b['devs'])
-            kind = (' chk' if b['check'] else '') + (' vf' if b['verified'] else '')
-            vf = '<span class="vbadge" title="Выполнено на стенде автора: %s">✓ стенд</span>' % E(b['verified']) if b['verified'] else ''
+            kind = ' chk' if b['check'] else ''
             exp = '<div class="exp"><span class="expl">Ожидается</span><div class="expt">%s</div></div>' % T(b['expect']) if b['expect'] else ''
             bl.append('''<div class="block%s" id="%s" data-dev="%s" data-kind="%s">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: %s"><span class="box" aria-hidden="true"></span></label><div class="bt">%s<span class="btitle">%s</span>%s</div><button class="copy" type="button">Копировать</button></div>
-<pre><code>%s</code></pre>%s</div>''' % (kind, bid, E('|'.join(b['devs'])), 'check' if b['check'] else 'cmd', E(plain(b['title'])), badges, T(b['title']), vf, hl(b['code']), exp))
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: %s"><span class="box" aria-hidden="true"></span></label><div class="bt">%s<span class="btitle">%s</span></div><button class="copy" type="button">Копировать</button></div>
+<pre><code>%s</code></pre>%s</div>''' % (kind, bid, E('|'.join(b['devs'])), 'check' if b['check'] else 'cmd', E(plain(b['title'])), badges, T(b['title']), hl(b['code']), exp))
         body.append('''<section class="step" id="%s" data-num="%s" data-title="%s">
 <div class="sh"><span class="snum">%s</span><div><div class="exam">%s</div><h3>%s</h3></div></div>
 <p class="sd">%s</p>
@@ -844,20 +840,6 @@ def page(i):
     return len(out)
 
 # ---------- главная ----------
-PITFALLS = [
- ('m1', 't5', 'Баннер SSH дословно «@BANNER@» и одинаковый на всех ВМ — транслит и «For autorized!!!» не засчитываются'),
- ('m1', 't3', 'На серверах — <code>sshuser</code> (UID @SSH_UID@), на маршрутизаторах — <code>net_admin</code>; то же в <code>AllowUsers</code> и инвентаре Ansible'),
- ('m1', 'check', 'Ровно один маршрут по умолчанию: лишний <code>default</code> через сеть управления @MG_IF@ ломает выход в Интернет'),
- ('m1', 't7', 'OSPF только на gre1: <code>passive-interface default</code> и явный <code>router-id</code>, иначе выбирается адрес сети управления'),
- ('m1', 'prep', 'Клонированные ВМ: новые ключи хоста SSH и machine-id — иначе у разных ВМ один отпечаток'),
- ('m1', 't9', 'DHCP выдаёт только DNS HQ-SRV (@HQ_SRV_IP@), без посторонних 1.1.1.1 / 8.8.8.8'),
- ('m1', 'vlan', 'Маски по КИМ: VLAN серверов /27, клиентов /28, управления /29 (кнопка «Маски по КИМ» в параметрах); VLAN @V_MGMT@ — тоже по КИМ'),
- ('m1', 't11', 'Часовой пояс @TZ@ на всех шести ВМ, а не только на HQ-CLI'),
- ('m2', 'm2t1', 'Файлы в <code>/etc/sudoers.d</code> — права 0400, иначе visudo ругается; после ужесточения SSH не возвращать вход по паролю на всех ВМ'),
- ('m3', 'm3t4', 'Сертификаты ровно на @CA_DAYS@ дней, доверие на HQ-CLI — <code>update-ca-trust</code>, а не <code>update-ca-certificates</code>'),
- ('m3', 'm3t5', 'atop: <code>LOGINTERVAL=@ATOP_INT@</code> записан в <code>/etc/default/atop</code>, иначе после перезагрузки сбросится'),
- ('m3', 'm3t8', 'fail2ban следит за портом @SSH_PORT@, а не 22; <code>bantime</code> — в секундах'),
-]
 LESSONS = [
  ('3', 'Развёртывание стенда и L2', [('m1', 'prep', 'Подготовка')], 'pre-lab4'),
  ('4', 'Конфигурация узла и ужесточение доступа', [('m1', 't1', 'М1 п.1'), ('m1', 't3', 'п.3'), ('m1', 't5', 'п.5'), ('m1', 't11', 'п.11')], 'pre-lab5'),
@@ -876,15 +858,14 @@ LESSONS = [
 CARD = '''<a class="mcard" href="%s" data-mod="%s" data-blocks="%s">
 <span class="mk"><span class="mnum">%s</span>Задание %s КИМ · занятия %s</span>
 <span class="mt">%s</span><span class="md">%s</span>
-<span class="mstat">%d шагов · %d блоков · <span class="vbadge">✓ стенд</span> %d</span>
+<span class="mstat">%d шагов · %d блоков</span>
 <span class="mprog" aria-hidden="true"><span data-bar></span></span><span class="mdone" data-done>не начат</span></a>'''
 
 def home():
     cards = []
     for pg in PAGES:
-        ids = block_ids(pg['steps']); vf = sum(1 for st in pg['steps'] for b in st['blocks'] if b['verified'])
-        cards.append(CARD % (pg['file'], pg['pid'], ' '.join(ids), pg['num'], pg['num'], pg['lessons'], E(pg['name']), E(pg['card']), len(pg['steps']), len(ids), vf))
-    pit = '\n'.join('<li><a href="%s#%s">%s</a></li>' % (FILE[m], a, tok(t)) for m, a, t in PITFALLS)
+        ids = block_ids(pg['steps'])
+        cards.append(CARD % (pg['file'], pg['pid'], ' '.join(ids), pg['num'], pg['num'], pg['lessons'], E(pg['name']), E(pg['card']), len(pg['steps']), len(ids)))
     les = '\n'.join('<tr><td class="m">%s</td><td>%s</td><td>%s</td><td><code>%s</code></td></tr>' % (
         n, E(t), ' · '.join('<a href="%s#%s">%s</a>' % (FILE[m], a, E(l)) for m, a, l in links) or '<span class="hint">вне КИМ, на сайте нет</span>', E(sn))
         for n, t, links, sn in LESSONS)
@@ -894,7 +875,7 @@ def home():
     tpl = tok(HOME)   # @ТОКЕНЫ@ в статичной части главной
     out = fill(tpl, {'TITLE': 'Стенд au-team.irpo · ДЭ 09.02.06 — главная',
                      'DESC': 'Документация сети и команды настройки учебного стенда (ALT Linux) по трём модулям демоэкзамена 09.02.06. Команды пересобираются под ваши параметры сети.',
-                     'SITE_URL': SITE_URL, 'OG_URL': SITE_URL, 'MODS': mods('home'), 'CARDS': '\n'.join(cards), 'PITFALLS': pit, 'LESSONS': les,
+                     'SITE_URL': SITE_URL, 'OG_URL': SITE_URL, 'MODS': mods('home'), 'CARDS': '\n'.join(cards), 'LESSONS': les,
                      'IDMAP': json.dumps(idmap, separators=(',', ':')), 'FILES': json.dumps(FILE, separators=(',', ':')), 'VERSION': VERSION})
     open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(out)
     return len(out)

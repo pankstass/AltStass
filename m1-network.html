@@ -71,7 +71,6 @@
 
 <h2 id="docs">Документация сети</h2>
 <p class="lead">Все ВМ: <code><span class="v" data-k="ISP_WAN">enp0s3</span></code> — NAT VirtualBox, <code><span class="v" data-k="MG_IF">enp0s8</span></code> — Host-Only (управление с хоста). <span class="hint">Значения с подчёркиванием берутся из <button type="button" class="linkbtn" data-open-params>параметров сети</button>.</span></p>
-<div class="note"><b>Проверено по отчёту.</b> Метка <span class="vbadge">✓ стенд</span> стоит у блоков, решение которых выполнено на стенде автора в занятиях №4–9 (VLAN через etcnet, NAT в <code>/etc/nftables/nftables.nft</code>, GRE через <code>iptun</code>, OSPF с MD5, DHCP с override юнита, BIND в chroot). Добавлены проверки на типовые ошибки из отчёта: баннер, учётки, один маршрут по умолчанию, ключи хоста у клонов.</div>
 
 <h4 id="topology">Топология</h4>
 <div class="card topo">
@@ -214,8 +213,13 @@
 <tr><td></td><td class="m"><span class="v" data-k="BR_LAN_IF">enp0s10</span>.<span class="v" data-k="V_MGMT">999</span></td><td class="m"><span class="v" data-k="BR_GW_MGMT">10.1.99.1/28</span></td><td class="m">—</td><td>VLAN <span class="v" data-k="V_MGMT">999</span> — управление</td></tr>
 <tr><td></td><td class="m">gre1</td><td class="m"><span class="v" data-k="GRE_BR_CIDR">10.10.10.2/30</span></td><td class="m">—</td><td>Туннель к HQ-RTR</td></tr>
 <tr><td><span class="dev d-br">BR-SRV</span></td><td class="m"><span class="v" data-k="BR_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span></td><td class="m"><span class="v" data-k="BR_SRV_CIDR">10.1.100.20/28</span></td><td class="m"><span class="v" data-k="BR_GW_SRV_IP">10.1.100.17</span></td><td><code>lab-core-br</code>, VLAN <span class="v" data-k="V_SRV">100</span></td></tr>
-<tr class="grp"><td colspan="5">Управление (<span class="v" data-k="MG_IF">enp0s8</span>, Host-Only)</td></tr>
-<tr><td colspan="5" class="m wrap">HQ-RTR <span class="v" data-k="MG_HQRTR_CIDR">192.168.56.10/24</span> · HQ-SRV <span class="v" data-k="MG_HQSRV_CIDR">192.168.56.20/24</span> · HQ-CLI <span class="v" data-k="MG_HQCLI_CIDR">192.168.56.30/24</span> · ISP <span class="v" data-k="MG_ISP_CIDR">192.168.56.40/24</span> · BR-RTR <span class="v" data-k="MG_BRRTR_CIDR">192.168.56.50/24</span> · BR-SRV <span class="v" data-k="MG_BRSRV_CIDR">192.168.56.60/24</span></td></tr>
+<tr class="grp"><td colspan="5">Управление (Host-Only)</td></tr>
+<tr><td><span class="dev d-isp">ISP</span></td><td class="m"><span class="v" data-k="MG_IF">enp0s8</span></td><td class="m"><span class="v" data-k="MG_ISP_CIDR">192.168.56.40/24</span></td><td class="m">—</td><td>Host-Only, управление с хоста по SSH</td></tr>
+<tr><td><span class="dev d-hq">HQ-RTR</span></td><td class="m"><span class="v" data-k="MG_IF">enp0s8</span></td><td class="m"><span class="v" data-k="MG_HQRTR_CIDR">192.168.56.10/24</span></td><td class="m">—</td><td>Host-Only, управление с хоста по SSH</td></tr>
+<tr><td><span class="dev d-hq">HQ-SRV</span></td><td class="m"><span class="v" data-k="MG_IF">enp0s8</span></td><td class="m"><span class="v" data-k="MG_HQSRV_CIDR">192.168.56.20/24</span></td><td class="m">—</td><td>Host-Only, управление с хоста по SSH</td></tr>
+<tr><td><span class="dev d-hq">HQ-CLI</span></td><td class="m"><span class="v" data-k="MG_IF">enp0s8</span></td><td class="m"><span class="v" data-k="MG_HQCLI_CIDR">192.168.56.30/24</span></td><td class="m">—</td><td>Host-Only, управление с хоста по SSH</td></tr>
+<tr><td><span class="dev d-br">BR-RTR</span></td><td class="m"><span class="v" data-k="MG_IF">enp0s8</span></td><td class="m"><span class="v" data-k="MG_BRRTR_CIDR">192.168.56.50/24</span></td><td class="m">—</td><td>Host-Only, управление с хоста по SSH</td></tr>
+<tr><td><span class="dev d-br">BR-SRV</span></td><td class="m"><span class="v" data-k="MG_IF">enp0s8</span></td><td class="m"><span class="v" data-k="MG_BRSRV_CIDR">192.168.56.60/24</span></td><td class="m">—</td><td>Host-Only, управление с хоста по SSH</td></tr>
 </table></div>
 
 <h4 id="vlan">VLAN и подсети</h4>
@@ -440,8 +444,8 @@
 <span class="k">sed</span> <span class="o">-i</span> <span class="s">&#x27;s/^net.ipv4.ip_forward.*/net.ipv4.ip_forward = 1/&#x27;</span> /etc/net/sysctl.conf
 <span class="k">sysctl</span> <span class="o">-w</span> net.ipv4.ip_forward=1
 <span class="k">systemctl</span> restart network
-<span class="k">ip</span> <span class="o">-br</span> a</code></pre></div><div class="block vf" id="t2-2" data-dev="ISP" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: NAT в сторону Интернета"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">NAT в сторону Интернета</span><span class="vbadge" title="Выполнено на стенде автора: занятие №7">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">ip</span> <span class="o">-br</span> a</code></pre></div><div class="block" id="t2-2" data-dev="ISP" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: NAT в сторону Интернета"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">NAT в сторону Интернета</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">cat</span> <span class="op">&gt;</span> /etc/nftables/nftables.nft <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
 <span class="c">#!/usr/sbin/nft -f</span>
 <span class="p">flush</span> ruleset
@@ -482,8 +486,8 @@
 <section class="step" id="t4" data-num="4" data-title="Коммутация в сегменте HQ (VLAN)">
 <div class="sh"><span class="snum">4</span><div><div class="exam">Задание 1 · пункт 4</div><h3>Коммутация в сегменте HQ (VLAN)</h3></div></div>
 <p class="sd">Router-on-a-stick: все VLAN маршрутизируются через один адаптер HQ-RTR (внутренняя сеть lab-core). HQ-SRV и HQ-CLI тегируют трафик сами.</p>
-<div class="block vf" id="t4-1" data-dev="HQ-RTR" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Trunk + VLAN 100 / 200 / 999"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">Trunk + VLAN <span class="v" data-k="V_SRV">100</span> / <span class="v" data-k="V_CLI">200</span> / <span class="v" data-k="V_MGMT">999</span></span><span class="vbadge" title="Выполнено на стенде автора: занятие №5">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block" id="t4-1" data-dev="HQ-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Trunk + VLAN 100 / 200 / 999"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">Trunk + VLAN <span class="v" data-k="V_SRV">100</span> / <span class="v" data-k="V_CLI">200</span> / <span class="v" data-k="V_MGMT">999</span></span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">modprobe</span> 8021q
 <span class="k">grep</span> <span class="o">-qx</span> 8021q /etc/modules <span class="op">||</span> <span class="k">echo</span> 8021q <span class="op">&gt;&gt;</span> /etc/modules
 <span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>
@@ -519,8 +523,8 @@
 <span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="HQ_GW_CLI">10.0.200.1/24</span>&#x27;</span>  <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_CLI">200</span>/ipv4address
 <span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="HQ_GW_MGMT">10.0.99.1/24</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_LAN_IF">enp0s9</span>.<span class="v" data-k="V_MGMT">999</span>/ipv4address
 <span class="k">systemctl</span> restart network
-<span class="k">ip</span> <span class="o">-br</span> a</code></pre></div><div class="block vf" id="t4-2" data-dev="HQ-SRV" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: VLAN 100"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">VLAN <span class="v" data-k="V_SRV">100</span></span><span class="vbadge" title="Выполнено на стенде автора: занятие №5">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">ip</span> <span class="o">-br</span> a</code></pre></div><div class="block" id="t4-2" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: VLAN 100"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">VLAN <span class="v" data-k="V_SRV">100</span></span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">modprobe</span> 8021q
 <span class="k">grep</span> <span class="o">-qx</span> 8021q /etc/modules <span class="op">||</span> <span class="k">echo</span> 8021q <span class="op">&gt;&gt;</span> /etc/modules
 <span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="HQ_SRV_IF">enp0s9</span>
@@ -537,8 +541,8 @@
 <span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="HQ_SRV_CIDR">10.0.100.20/24</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/ipv4address
 <span class="k">echo</span> <span class="s">&#x27;default via <span class="v" data-k="HQ_GW_SRV_IP">10.0.100.1</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/ipv4route
 <span class="k">systemctl</span> restart network
-<span class="k">ping</span> <span class="o">-c3</span> <span class="v" data-k="HQ_GW_SRV_IP">10.0.100.1</span></code></pre></div><div class="block vf" id="t4-3" data-dev="HQ-CLI" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: VLAN 200 (статикой, до задания 9)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">VLAN <span class="v" data-k="V_CLI">200</span> (статикой, до задания 9)</span><span class="vbadge" title="Выполнено на стенде автора: занятие №5">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">ping</span> <span class="o">-c3</span> <span class="v" data-k="HQ_GW_SRV_IP">10.0.100.1</span></code></pre></div><div class="block" id="t4-3" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: VLAN 200 (статикой, до задания 9)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">VLAN <span class="v" data-k="V_CLI">200</span> (статикой, до задания 9)</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">modprobe</span> 8021q
 <span class="k">grep</span> <span class="o">-qx</span> 8021q /etc/modules <span class="op">||</span> <span class="k">echo</span> 8021q <span class="op">&gt;&gt;</span> /etc/modules
 <span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/<span class="v" data-k="HQ_CLI_IF">enp0s9</span>
@@ -585,8 +589,8 @@
 <section class="step" id="t6" data-num="6" data-title="IP-туннель GRE">
 <div class="sh"><span class="snum">6</span><div><div class="exam">Задание 1 · пункт 6</div><h3>IP-туннель GRE</h3></div></div>
 <p class="sd">Минимальная маска для двух адресов туннеля — /30.</p>
-<div class="block vf" id="t6-1" data-dev="HQ-RTR" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: gre1 → BR-RTR"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">gre1 → BR-RTR</span><span class="vbadge" title="Выполнено на стенде автора: занятие №8">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block" id="t6-1" data-dev="HQ-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: gre1 → BR-RTR"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">gre1 → BR-RTR</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/gre1
 <span class="k">cat</span> <span class="op">&gt;</span> /etc/net/ifaces/gre1/options <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
 <span class="p">TYPE</span>=<span class="s">iptun</span>
@@ -602,8 +606,8 @@
 <span class="h">EOF</span>
 <span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="GRE_HQ">10.10.10.1/30</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/gre1/ipv4address
 <span class="k">systemctl</span> restart network
-<span class="k">ip</span> <span class="o">-br</span> a show gre1</code></pre></div><div class="block vf" id="t6-2" data-dev="BR-RTR" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: gre1 → HQ-RTR"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-RTR</span><span class="btitle">gre1 → HQ-RTR</span><span class="vbadge" title="Выполнено на стенде автора: занятие №8">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">ip</span> <span class="o">-br</span> a show gre1</code></pre></div><div class="block" id="t6-2" data-dev="BR-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: gre1 → HQ-RTR"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-RTR</span><span class="btitle">gre1 → HQ-RTR</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/net/ifaces/gre1
 <span class="k">cat</span> <span class="op">&gt;</span> /etc/net/ifaces/gre1/options <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
 <span class="p">TYPE</span>=<span class="s">iptun</span>
@@ -619,8 +623,8 @@
 <span class="h">EOF</span>
 <span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="GRE_BR_CIDR">10.10.10.2/30</span>&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/gre1/ipv4address
 <span class="k">systemctl</span> restart network
-<span class="k">ip</span> <span class="o">-br</span> a show gre1</code></pre></div><div class="block chk vf" id="t6-3" data-dev="HQ-RTR" data-kind="check">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">Проверка</span><span class="vbadge" title="Выполнено на стенде автора: занятие №8">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">ip</span> <span class="o">-br</span> a show gre1</code></pre></div><div class="block chk" id="t6-3" data-dev="HQ-RTR" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">ping</span> <span class="o">-c3</span> <span class="v" data-k="GRE_BR">10.10.10.2</span></code></pre><div class="exp"><span class="expl">Ожидается</span><div class="expt">3 packets transmitted, 3 received, 0% packet loss</div></div></div>
 </section>
 <section class="step" id="t7" data-num="7" data-title="Динамическая маршрутизация OSPF">
@@ -683,16 +687,16 @@
 <span class="c">!</span>
 <span class="h">EOF</span>
 <span class="k">systemctl</span> enable <span class="o">--now</span> frr
-<span class="k">systemctl</span> restart frr</code></pre></div><div class="block chk vf" id="t7-3" data-dev="HQ-RTR|BR-RTR" data-kind="check">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка: сосед в состоянии Full"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="dev d-br">BR-RTR</span><span class="btitle">Проверка: сосед в состоянии Full</span><span class="vbadge" title="Выполнено на стенде автора: занятие №8">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">systemctl</span> restart frr</code></pre></div><div class="block chk" id="t7-3" data-dev="HQ-RTR|BR-RTR" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка: сосед в состоянии Full"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="dev d-br">BR-RTR</span><span class="btitle">Проверка: сосед в состоянии Full</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">vtysh</span> <span class="o">-c</span> <span class="s">&#x27;show ip ospf neighbor&#x27;</span>
 <span class="k">vtysh</span> <span class="o">-c</span> <span class="s">&#x27;show ip route ospf&#x27;</span></code></pre><div class="exp"><span class="expl">Ожидается</span><div class="expt">сосед в состоянии Full/-, интерфейс gre1; маршруты O&gt;* до сетей другого офиса</div></div></div>
 </section>
 <section class="step" id="t8" data-num="8" data-title="Динамическая трансляция адресов (NAT)">
 <div class="sh"><span class="snum">8</span><div><div class="exam">Задание 1 · пункт 8</div><h3>Динамическая трансляция адресов (NAT)</h3></div></div>
 <p class="sd">Masquerade в сторону ISP. Трафик между офисами идёт через gre1 и не транслируется.</p>
-<div class="block vf" id="t8-1" data-dev="HQ-RTR" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: NAT → ISP (enp0s10)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">NAT → ISP (<span class="v" data-k="HQ_WAN_IF">enp0s10</span>)</span><span class="vbadge" title="Выполнено на стенде автора: занятие №8">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block" id="t8-1" data-dev="HQ-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: NAT → ISP (enp0s10)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">NAT → ISP (<span class="v" data-k="HQ_WAN_IF">enp0s10</span>)</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">cat</span> <span class="op">&gt;</span> /etc/nftables/nftables.nft <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
 <span class="c">#!/usr/sbin/nft -f</span>
 <span class="p">flush</span> ruleset
@@ -706,8 +710,8 @@
 <span class="h">EOF</span>
 <span class="k">systemctl</span> enable <span class="o">--now</span> nftables
 <span class="k">systemctl</span> restart nftables
-<span class="k">nft</span> list ruleset</code></pre></div><div class="block vf" id="t8-2" data-dev="BR-RTR" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: NAT → ISP (enp0s9)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-RTR</span><span class="btitle">NAT → ISP (<span class="v" data-k="BR_WAN_IF">enp0s9</span>)</span><span class="vbadge" title="Выполнено на стенде автора: занятие №8">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">nft</span> list ruleset</code></pre></div><div class="block" id="t8-2" data-dev="BR-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: NAT → ISP (enp0s9)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-RTR</span><span class="btitle">NAT → ISP (<span class="v" data-k="BR_WAN_IF">enp0s9</span>)</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">cat</span> <span class="op">&gt;</span> /etc/nftables/nftables.nft <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
 <span class="c">#!/usr/sbin/nft -f</span>
 <span class="p">flush</span> ruleset
@@ -721,15 +725,15 @@
 <span class="h">EOF</span>
 <span class="k">systemctl</span> enable <span class="o">--now</span> nftables
 <span class="k">systemctl</span> restart nftables
-<span class="k">nft</span> list ruleset</code></pre></div><div class="block chk vf" id="t8-3" data-dev="HQ-SRV|BR-SRV" data-kind="check">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-br">BR-SRV</span><span class="btitle">Проверка</span><span class="vbadge" title="Выполнено на стенде автора: занятие №8">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">nft</span> list ruleset</code></pre></div><div class="block chk" id="t8-3" data-dev="HQ-SRV|BR-SRV" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-br">BR-SRV</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">ping</span> <span class="o">-c3</span> 77.88.8.8</code></pre><div class="exp"><span class="expl">Ожидается</span><div class="expt">0% packet loss</div></div></div>
 </section>
 <section class="step" id="t9" data-num="9" data-title="DHCP для HQ-CLI">
 <div class="sh"><span class="snum">9</span><div><div class="exam">Задание 1 · пункт 9</div><h3>DHCP для HQ-CLI</h3></div></div>
 <p class="sd">Сервер — HQ-RTR, только на VLAN клиентов. Адрес маршрутизатора исключён из пула; HQ-CLI получает зарезервированный адрес по MAC.</p>
-<div class="block vf" id="t9-1" data-dev="HQ-RTR" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: dhcpd"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">dhcpd</span><span class="vbadge" title="Выполнено на стенде автора: занятие №9">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block" id="t9-1" data-dev="HQ-RTR" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: dhcpd"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-RTR</span><span class="btitle">dhcpd</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">cat</span> <span class="op">&gt;</span> /etc/dhcp/dhcpd.conf <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
 <span class="p">option</span> domain-name &quot;<span class="v" data-k="DOMAIN">au-team.irpo</span>&quot;;
 <span class="p">option</span> domain-name-servers <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>;
@@ -814,8 +818,8 @@
     <span class="p">file</span> &quot;/zone/<span class="v" data-k="REV_BR_FILE">10.1.100.rev</span>&quot;;
 <span class="p">};</span>
 <span class="h">EOF</span>
-<span class="k">named-checkconf</span></code></pre></div><div class="block vf" id="t10-2" data-dev="HQ-SRV" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Файлы зон"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Файлы зон</span><span class="vbadge" title="Выполнено на стенде автора: занятие №9">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">named-checkconf</span></code></pre></div><div class="block" id="t10-2" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Файлы зон"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Файлы зон</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">mkdir</span> <span class="o">-p</span> /var/lib/bind/zone
 <span class="k">cat</span> <span class="op">&gt;</span> /var/lib/bind/zone/<span class="v" data-k="DOMAIN">au-team.irpo</span>.zone <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
 <span class="p">$TTL</span> 1D
@@ -862,8 +866,8 @@
 <span class="k">systemctl</span> restart bind
 
 <span class="k">printf</span> <span class="s">&#x27;search <span class="v" data-k="DOMAIN">au-team.irpo</span>\nnameserver 127.0.0.1\n&#x27;</span> <span class="op">&gt;</span> /etc/net/ifaces/<span class="v" data-k="HQ_SRV_IF">enp0s9</span>.<span class="v" data-k="V_SRV">100</span>/resolv.conf
-<span class="k">systemctl</span> restart network</code></pre></div><div class="block chk vf" id="t10-4" data-dev="HQ-SRV|HQ-CLI" data-kind="check">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-hq">HQ-CLI</span><span class="btitle">Проверка</span><span class="vbadge" title="Выполнено на стенде автора: занятие №9">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">systemctl</span> restart network</code></pre></div><div class="block chk" id="t10-4" data-dev="HQ-SRV|HQ-CLI" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-hq">HQ-CLI</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> <span class="v" data-k="H_HQRTR">hq-rtr.au-team.irpo</span> +short
 <span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> <span class="v" data-k="H_BRSRV">br-srv.au-team.irpo</span> +short
 <span class="k">dig</span> @<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> <span class="o">-x</span> <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span> +short
@@ -881,8 +885,8 @@
 <section class="step" id="check" data-num="✓" data-title="Итоговая проверка">
 <div class="sh"><span class="snum">✓</span><div><div class="exam">вне КИМ</div><h3>Итоговая проверка</h3></div></div>
 <p class="sd">Быстрый прогон перед сдачей.</p>
-<div class="block chk vf" id="check-1" data-dev="HQ-CLI" data-kind="check">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Связность, DNS, SSH"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Связность, DNS, SSH</span><span class="vbadge" title="Выполнено на стенде автора: занятие №4">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block chk" id="check-1" data-dev="HQ-CLI" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Связность, DNS, SSH"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Связность, DNS, SSH</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">ip</span> <span class="o">-br</span> a
 <span class="k">ip</span> route
 <span class="k">ping</span> <span class="o">-c2</span> <span class="v" data-k="HQ_GW_CLI_IP">10.0.200.1</span>

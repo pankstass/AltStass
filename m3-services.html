@@ -63,7 +63,6 @@
 
 <h2 id="docs">Что понадобится</h2>
 <p class="lead">Модуль 3 выполняется поверх Модулей 1 и 2: нужны DNS-записи <code>web</code> и <code>docker</code>, проброс портов на маршрутизаторах, домен на BR-SRV и инвентарь Ansible. <span class="hint">Значения с подчёркиванием берутся из <button type="button" class="linkbtn" data-open-params>параметров сети</button>.</span></p>
-<div class="note"><b>Проверено на стенде.</b> Блоки с меткой <span class="vbadge">✓ стенд</span> выполнены на стенде автора (занятия №13–15) и записаны по отчёту. Блоки-проверки без метки добавлены для самоконтроля: на стенде они не снимались, сверяйте вывод с подсказкой «Ожидается».</div>
 <h4 id="needs">Подготовка</h4>
 <div class="tw"><table>
 <tr><th>ВМ</th><th>Что нужно</th><th>Для пунктов</th></tr>
@@ -107,8 +106,8 @@
 <section class="step" id="m3t1" data-num="1" data-title="Импорт пользователей в домен">
 <div class="sh"><span class="snum">1</span><div><div class="exam">Задание 3 · пункт 1</div><h3>Импорт пользователей в домен</h3></div></div>
 <p class="sd">Скрипт <code>import.sh</code> и <code>users.csv</code> лежат на Additional.iso. Файлы сохранены с переводами строк Windows (CRLF): без исправления bash падает с ошибкой «синтаксическая ошибка рядом с неожиданным маркером <code>done</code>». Образ смонтирован только для чтения, поэтому файлы копируются в <code>/root/import</code>.</p>
-<div class="block vf" id="m3t1-1" data-dev="BR-SRV" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Импорт из users.csv"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Импорт из users.csv</span><span class="vbadge" title="Выполнено на стенде автора: занятие №13">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block" id="m3t1-1" data-dev="BR-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Импорт из users.csv"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Импорт из users.csv</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">mkdir</span> <span class="o">-p</span> <span class="v" data-k="ISO_DIR">/opt/additional</span>
 <span class="c"># содержимое Additional.iso; если каталог пуст — монтируем диск</span>
 <span class="k">[</span> <span class="o">-n</span> <span class="s">&quot;$(ls -A <span class="v" data-k="ISO_DIR">/opt/additional</span> 2&gt;/dev/null)&quot;</span> ] <span class="op">||</span> <span class="k">mount</span> <span class="v" data-k="ISO_DEV">/dev/sr0</span> <span class="v" data-k="ISO_DIR">/opt/additional</span>
@@ -118,8 +117,8 @@
 <span class="c"># CRLF → LF, иначе «неожиданный маркер done»</span>
 <span class="k">sed</span> <span class="o">-i</span> <span class="s">&#x27;s/\r$//&#x27;</span> import.sh users.csv
 <span class="k">chmod</span> +x import.sh
-<span class="k">bash</span> import.sh users.csv</code></pre></div><div class="block chk vf" id="m3t1-2" data-dev="BR-SRV" data-kind="check">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Проверка</span><span class="vbadge" title="Выполнено на стенде автора: занятие №13">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">bash</span> import.sh users.csv</code></pre></div><div class="block chk" id="m3t1-2" data-dev="BR-SRV" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">samba-tool</span> user list <span class="op">|</span> <span class="k">wc</span> <span class="o">-l</span>
 <span class="k">samba-tool</span> ou list
 <span class="k">samba-tool</span> user list <span class="op">|</span> <span class="k">sort</span> <span class="op">|</span> <span class="k">head</span></code></pre><div class="exp"><span class="expl">Ожидается</span><div class="expt">сотни пользователей (на стенде — 305 вместе со служебными и hquser), OU CloudStorage, IT, Manager, Overal, Supporter</div></div></div>
@@ -127,8 +126,8 @@
 <section class="step" id="m3t2" data-num="2" data-title="Обратный прокси-сервер на ISP">
 <div class="sh"><span class="snum">2</span><div><div class="exam">Задание 3 · пункт 2</div><h3>Обратный прокси-сервер на ISP</h3></div></div>
 <p class="sd">Nginx на ISP принимает запросы к <code>web.<span class="v" data-k="DOMAIN">au-team.irpo</span></code> и <code>docker.<span class="v" data-k="DOMAIN">au-team.irpo</span></code> (обе записи в DNS HQ-SRV указывают на ISP). ISP не знает внутренних сетей офисов, поэтому запросы уходят на внешние адреса маршрутизаторов и дальше по DNAT из задания 8 Модуля 2. В ALT конфигурации лежат в <code>sites-available.d</code> / <code>sites-enabled.d</code>.</p>
-<div class="block vf" id="m3t2-1" data-dev="ISP" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Nginx как reverse proxy"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">Nginx как reverse proxy</span><span class="vbadge" title="Выполнено на стенде автора: занятие №13">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block" id="m3t2-1" data-dev="ISP" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Nginx как reverse proxy"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">Nginx как reverse proxy</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">apt-get</span> update <span class="op">&amp;&amp;</span> <span class="k">apt-get</span> install <span class="o">-y</span> nginx
 <span class="k">systemctl</span> enable <span class="o">--now</span> nginx
 
@@ -156,16 +155,16 @@
 <span class="h">EOF</span>
 <span class="k">ln</span> <span class="o">-sf</span> /etc/nginx/sites-available.d/revproxy.conf /etc/nginx/sites-enabled.d/revproxy.conf
 <span class="k">rm</span> <span class="o">-f</span> /etc/nginx/sites-enabled.d/default.conf
-<span class="k">nginx</span> <span class="o">-t</span> <span class="op">&amp;&amp;</span> <span class="k">systemctl</span> restart nginx</code></pre></div><div class="block chk vf" id="m3t2-2" data-dev="ISP" data-kind="check">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">Проверка</span><span class="vbadge" title="Выполнено на стенде автора: занятие №13">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">nginx</span> <span class="o">-t</span> <span class="op">&amp;&amp;</span> <span class="k">systemctl</span> restart nginx</code></pre></div><div class="block chk" id="m3t2-2" data-dev="ISP" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">curl</span> <span class="o">-s</span> <span class="o">-H</span> <span class="s">&#x27;Host: web.<span class="v" data-k="DOMAIN">au-team.irpo</span>&#x27;</span> http://127.0.0.1/ <span class="op">|</span> <span class="k">grep</span> <span class="o">-i</span> <span class="s">&#x27;&lt;title&gt;&#x27;</span>
 <span class="k">curl</span> <span class="o">-s</span> <span class="o">-H</span> <span class="s">&#x27;Host: docker.<span class="v" data-k="DOMAIN">au-team.irpo</span>&#x27;</span> http://127.0.0.1/ <span class="op">|</span> <span class="k">grep</span> <span class="o">-i</span> <span class="s">&#x27;&lt;title&gt;&#x27;</span></code></pre><div class="exp"><span class="expl">Ожидается</span><div class="expt">&lt;title&gt; сайта Apache с HQ-SRV и &lt;title&gt; testapp с BR-SRV («Все студенты»)</div></div></div>
 </section>
 <section class="step" id="m3t3" data-num="3" data-title="Web-аутентификация на ISP">
 <div class="sh"><span class="snum">3</span><div><div class="exam">Задание 3 · пункт 3</div><h3>Web-аутентификация на ISP</h3></div></div>
 <p class="sd">Basic Auth в nginx только для <code>web.<span class="v" data-k="DOMAIN">au-team.irpo</span></code>: пользователь <code><span class="v" data-k="WEB_USER">WEB</span></code>, пароль <code><span class="v" data-k="PW">P@ssw0rd</span></code>. Утилита <code>htpasswd</code> в ALT — пакет <code>apache2-htpasswd</code>. Файл пересобирается целиком, поэтому блок можно выполнять повторно.</p>
-<div class="block vf" id="m3t3-1" data-dev="ISP" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Файл паролей и auth_basic"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">Файл паролей и auth_basic</span><span class="vbadge" title="Выполнено на стенде автора: занятие №13">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block" id="m3t3-1" data-dev="ISP" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Файл паролей и auth_basic"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">Файл паролей и auth_basic</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">apt-get</span> install <span class="o">-y</span> apache2-htpasswd
 <span class="c"># -b — пароль в команде; без -b htpasswd спросит его дважды</span>
 <span class="k">htpasswd</span> <span class="o">-cb</span> /etc/nginx/.htpasswd <span class="v" data-k="WEB_USER">WEB</span> <span class="s">&#x27;<span class="v" data-k="PW">P@ssw0rd</span>&#x27;</span>
@@ -204,8 +203,8 @@
 <section class="step" id="m3t4" data-num="4" data-title="Центр сертификации и HTTPS">
 <div class="sh"><span class="snum">4</span><div><div class="exam">Задание 3 · пункт 4</div><h3>Центр сертификации и HTTPS</h3></div></div>
 <p class="sd">ЦС на HQ-SRV (OpenSSL, RSA; на ДЭ с КриптоПро — ГОСТ). Сертификаты <code>web</code> и <code>docker</code> на <span class="v" data-k="CA_DAYS">30</span> дней с SAN, ключи и сертификаты забираются на ISP через проброс SSH HQ-RTR (задание 8 Модуля 2), корневой сертификат — в доверенные на HQ-CLI. В ALT доверие добавляется через <code>/etc/pki/ca-trust/source/anchors</code> и <code>update-ca-trust</code> (не <code>update-ca-certificates</code>).</p>
-<div class="block vf" id="m3t4-1" data-dev="HQ-SRV" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Корневой ЦС и сертификаты web, docker"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Корневой ЦС и сертификаты web, docker</span><span class="vbadge" title="Выполнено на стенде автора: занятие №14">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block" id="m3t4-1" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Корневой ЦС и сертификаты web, docker"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Корневой ЦС и сертификаты web, docker</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/ssl/ca <span class="op">&amp;&amp;</span> <span class="k">cd</span> /etc/ssl/ca
 <span class="k">[</span> <span class="o">-f</span> ca.key ] <span class="op">||</span> <span class="k">openssl</span> genrsa <span class="o">-out</span> ca.key 4096
 <span class="k">chmod</span> 600 ca.key
@@ -225,8 +224,8 @@
 <pre><code><span class="k">install</span> <span class="o">-d</span> <span class="o">-o</span> sshuser <span class="o">-g</span> sshuser <span class="o">-m</span> 700 /home/sshuser/certs
 <span class="k">cp</span> /etc/ssl/ca/{ca.crt,web.crt,web.key,docker.crt,docker.key} /home/sshuser/certs/
 <span class="k">chown</span> sshuser:sshuser /home/sshuser/certs/*
-<span class="k">ls</span> <span class="o">-l</span> /home/sshuser/certs</code></pre></div><div class="block vf" id="m3t4-3" data-dev="ISP" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Сертификаты и HTTPS в nginx"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">Сертификаты и HTTPS в nginx</span><span class="vbadge" title="Выполнено на стенде автора: занятие №14">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">ls</span> <span class="o">-l</span> /home/sshuser/certs</code></pre></div><div class="block" id="m3t4-3" data-dev="ISP" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Сертификаты и HTTPS в nginx"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-isp">ISP</span><span class="btitle">Сертификаты и HTTPS в nginx</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/nginx/ssl <span class="op">&amp;&amp;</span> <span class="k">cd</span> /etc/nginx/ssl
 <span class="c"># через DNAT HQ-RTR (<span class="v" data-k="HQ_WAN_IP">172.16.1.2</span>:<span class="v" data-k="SSH_PORT">2027</span> → HQ-SRV)</span>
 <span class="k">scp</span> <span class="o">-P</span> <span class="v" data-k="SSH_PORT">2027</span> <span class="o">-o</span> StrictHostKeyChecking=accept-new <span class="s">&#x27;sshuser@<span class="v" data-k="HQ_WAN_IP">172.16.1.2</span>:certs/*&#x27;</span> .
@@ -268,8 +267,8 @@
 <span class="h">EOF</span>
 <span class="k">ln</span> <span class="o">-sf</span> /etc/nginx/sites-available.d/revproxy.conf /etc/nginx/sites-enabled.d/revproxy.conf
 <span class="k">rm</span> <span class="o">-f</span> /etc/nginx/sites-enabled.d/default.conf
-<span class="k">nginx</span> <span class="o">-t</span> <span class="op">&amp;&amp;</span> <span class="k">systemctl</span> restart nginx</code></pre></div><div class="block vf" id="m3t4-4" data-dev="HQ-CLI" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Доверие к ЦС"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Доверие к ЦС</span><span class="vbadge" title="Выполнено на стенде автора: занятие №14">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">nginx</span> <span class="o">-t</span> <span class="op">&amp;&amp;</span> <span class="k">systemctl</span> restart nginx</code></pre></div><div class="block" id="m3t4-4" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Доверие к ЦС"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Доверие к ЦС</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">scp</span> <span class="o">-P</span> <span class="v" data-k="SSH_PORT">2027</span> sshuser@<span class="v" data-k="HQ_SRV_IP">10.0.100.20</span>:certs/ca.crt /tmp/ca.crt
 <span class="k">cp</span> /tmp/ca.crt /etc/pki/ca-trust/source/anchors/au-team-ca.crt
 <span class="k">update-ca-trust</span>
@@ -294,8 +293,8 @@
 <section class="step" id="m3t5" data-num="5" data-title="Мониторинг atop">
 <div class="sh"><span class="snum">5</span><div><div class="exam">Задание 3 · пункт 5</div><h3>Мониторинг atop</h3></div></div>
 <p class="sd">Интервал записи — 7 минут (<span class="v" data-k="ATOP_INT">420</span> с). В ALT файл <code>/etc/default/atop</code> изначально пуст, а параметр называется <code>LOGINTERVAL</code>: <code>sed</code> по <code>INTERVAL=</code> ничего не меняет, строку нужно дописать. Значение должно быть в файле, а не только в консоли, — иначе после перезагрузки оно сбросится.</p>
-<div class="block vf" id="m3t5-1" data-dev="HQ-SRV" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Установка и интервал"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Установка и интервал</span><span class="vbadge" title="Выполнено на стенде автора: занятие №14">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block" id="m3t5-1" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Установка и интервал"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Установка и интервал</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">apt-get</span> install <span class="o">-y</span> atop
 <span class="k">touch</span> /etc/default/atop
 <span class="k">if</span> grep <span class="o">-qE</span> <span class="s">&#x27;^(LOG)?INTERVAL=&#x27;</span> /etc/default/atop; <span class="k">then</span>
@@ -305,16 +304,16 @@
 <span class="k">fi</span>
 <span class="k">cat</span> /etc/default/atop
 <span class="k">systemctl</span> enable <span class="o">--now</span> atop
-<span class="k">systemctl</span> restart atop</code></pre></div><div class="block chk vf" id="m3t5-2" data-dev="HQ-SRV" data-kind="check">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка (и после перезагрузки)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Проверка (и после перезагрузки)</span><span class="vbadge" title="Выполнено на стенде автора: занятие №14">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">systemctl</span> restart atop</code></pre></div><div class="block chk" id="m3t5-2" data-dev="HQ-SRV" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка (и после перезагрузки)"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Проверка (и после перезагрузки)</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">systemctl</span> is-enabled atop
 <span class="k">ps</span> <span class="o">-o</span> args= <span class="o">-C</span> atop</code></pre><div class="exp"><span class="expl">Ожидается</span><div class="expt">enabled; /usr/bin/atop -w /var/log/atop/atop_ГГГГММДД <span class="v" data-k="ATOP_INT">420</span></div></div></div>
 </section>
 <section class="step" id="m3t6" data-num="6" data-title="Принт-сервер CUPS">
 <div class="sh"><span class="snum">6</span><div><div class="exam">Задание 3 · пункт 6</div><h3>Принт-сервер CUPS</h3></div></div>
 <p class="sd">Виртуальный PDF-принтер на HQ-SRV (пакет <code>cups-pdf</code>), общий доступ из сети; на HQ-CLI принтер подключается по IPP и назначается принтером по умолчанию. Готовые файлы — в <code>/var/spool/cups-pdf/</code> на HQ-SRV.</p>
-<div class="block vf" id="m3t6-1" data-dev="HQ-SRV" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: CUPS и принтер PDF"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">CUPS и принтер PDF</span><span class="vbadge" title="Выполнено на стенде автора: занятие №14">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block" id="m3t6-1" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: CUPS и принтер PDF"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">CUPS и принтер PDF</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">apt-get</span> install <span class="o">-y</span> cups cups-pdf
 <span class="k">systemctl</span> enable <span class="o">--now</span> cups
 <span class="k">lpinfo</span> <span class="o">-v</span> <span class="op">|</span> <span class="k">grep</span> cups-pdf
@@ -324,8 +323,8 @@
 <span class="k">systemctl</span> restart cups
 <span class="k">lpstat</span> <span class="o">-p</span> PDF <span class="op">&gt;/dev/null</span> 2&gt;&amp;1 <span class="op">||</span> <span class="k">lpadmin</span> <span class="o">-p</span> PDF <span class="o">-E</span> <span class="o">-v</span> cups-pdf:/ <span class="o">-m</span> CUPS-PDF.ppd <span class="o">-o</span> printer-is-shared=true
 <span class="k">lpadmin</span> <span class="o">-d</span> PDF
-<span class="k">lpstat</span> <span class="o">-t</span></code></pre><div class="exp"><span class="expl">Ожидается</span><div class="expt">предупреждение «Printer drivers are deprecated» не мешает; принтер PDF принимает запросы</div></div></div><div class="block vf" id="m3t6-2" data-dev="HQ-CLI" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Подключение и принтер по умолчанию"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Подключение и принтер по умолчанию</span><span class="vbadge" title="Выполнено на стенде автора: занятие №14">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">lpstat</span> <span class="o">-t</span></code></pre><div class="exp"><span class="expl">Ожидается</span><div class="expt">предупреждение «Printer drivers are deprecated» не мешает; принтер PDF принимает запросы</div></div></div><div class="block" id="m3t6-2" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Подключение и принтер по умолчанию"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Подключение и принтер по умолчанию</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">lpstat</span> <span class="o">-p</span> PDF-Printer <span class="op">&gt;/dev/null</span> 2&gt;&amp;1 <span class="op">||</span> <span class="k">lpadmin</span> <span class="o">-p</span> PDF-Printer <span class="o">-E</span> <span class="o">-v</span> ipp://<span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>:631/printers/PDF <span class="o">-m</span> everywhere
 <span class="k">lpadmin</span> <span class="o">-d</span> PDF-Printer
 <span class="k">lpoptions</span> <span class="o">-d</span> PDF-Printer <span class="op">&gt;/dev/null</span>
@@ -338,8 +337,8 @@
 <section class="step" id="m3t7" data-num="7" data-title="Инвентаризация через Ansible">
 <div class="sh"><span class="snum">7</span><div><div class="exam">Задание 3 · пункт 7</div><h3>Инвентаризация через Ansible</h3></div></div>
 <p class="sd">Плейбук на BR-SRV собирает имя и IP HQ-SRV и HQ-CLI и сохраняет их <b>на BR-SRV</b> в <code>/etc/ansible/PC-INFO/&lt;хост&gt;.yml</code> — для этого задача делегируется на <code>localhost</code>. Использует инвентарь из задания 5 Модуля 2.</p>
-<div class="block vf" id="m3t7-1" data-dev="BR-SRV" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Плейбук inventory.yml"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Плейбук inventory.yml</span><span class="vbadge" title="Выполнено на стенде автора: занятие №15">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block" id="m3t7-1" data-dev="BR-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Плейбук inventory.yml"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Плейбук inventory.yml</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">mkdir</span> <span class="o">-p</span> /etc/ansible/PC-INFO /etc/ansible/playbook
 <span class="k">cat</span> <span class="op">&gt;</span> /etc/ansible/playbook/inventory.yml <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
 <span class="p">-</span> name: Инвентаризация HQ-SRV и HQ-CLI
@@ -354,16 +353,16 @@
         <span class="p">dest:</span> &quot;/etc/ansible/PC-INFO/{{ inventory_hostname }}.yml&quot;
       <span class="p">delegate_to:</span> localhost
 <span class="h">EOF</span>
-<span class="k">ansible-playbook</span> /etc/ansible/playbook/inventory.yml</code></pre></div><div class="block chk vf" id="m3t7-2" data-dev="BR-SRV" data-kind="check">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Проверка</span><span class="vbadge" title="Выполнено на стенде автора: занятие №15">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">ansible-playbook</span> /etc/ansible/playbook/inventory.yml</code></pre></div><div class="block chk" id="m3t7-2" data-dev="BR-SRV" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-br">BR-SRV</span><span class="btitle">Проверка</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">ls</span> <span class="o">-l</span> /etc/ansible/PC-INFO/
 <span class="k">cat</span> /etc/ansible/PC-INFO/*.yml</code></pre><div class="exp"><span class="expl">Ожидается</span><div class="expt">hq-cli.yml, hq-srv.yml; hostname: <span class="v" data-k="H_HQCLI">hq-cli.au-team.irpo</span>, ip_address: <span class="v" data-k="HQ_CLI_IP">10.0.200.30</span>; hostname: <span class="v" data-k="H_HQSRV">hq-srv.au-team.irpo</span>, ip_address: <span class="v" data-k="HQ_SRV_IP">10.0.100.20</span></div></div></div>
 </section>
 <section class="step" id="m3t8" data-num="8" data-title="Защита SSH: fail2ban">
 <div class="sh"><span class="snum">8</span><div><div class="exam">Задание 3 · пункт 8</div><h3>Защита SSH: fail2ban</h3></div></div>
 <p class="sd">Jail <code>sshd</code> на порту <span class="v" data-k="SSH_PORT">2027</span> (не 22!), <span class="v" data-k="F2B_RETRY">3</span> попытки, блокировка <span class="v" data-k="F2B_BAN">60</span> с (в новых версиях bantime — в секундах). В ALT журнал sshd читается через systemd (<code>backend = systemd</code>, нужен <code>python3-module-systemd</code>), блокировка — через nftables.</p>
-<div class="block vf" id="m3t8-1" data-dev="HQ-SRV" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Установка и jail.local"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Установка и jail.local</span><span class="vbadge" title="Выполнено на стенде автора: занятие №15">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block" id="m3t8-1" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Установка и jail.local"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Установка и jail.local</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">apt-get</span> install <span class="o">-y</span> fail2ban python3-module-systemd nftables
 <span class="k">cat</span> <span class="op">&gt;</span> /etc/fail2ban/jail.local <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
 <span class="p">[DEFAULT]</span>
@@ -395,30 +394,30 @@
 <section class="step" id="m3t9" data-num="9" data-title="Резервное копирование BorgBackup">
 <div class="sh"><span class="snum">9</span><div><div class="exam">Задание 3 · пункт 9</div><h3>Резервное копирование BorgBackup</h3></div></div>
 <p class="sd">Аналог «Кибер Бэкап» с защитой от шифровальщиков: HQ-SRV отправляет <code>/etc</code> в репозиторий на HQ-CLI. Ключ HQ-SRV на HQ-CLI ограничен командой <code>borg serve --append-only --restrict-to-path /backup</code>: заражённый HQ-SRV может добавлять архивы, но не удалять и не перезаписывать старые. Репозиторий зашифрован (<code>repokey</code>), копия — ежедневно по таймеру systemd.</p>
-<div class="block vf" id="m3t9-1" data-dev="HQ-SRV|HQ-CLI" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пакет borg"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-hq">HQ-CLI</span><span class="btitle">Пакет borg</span><span class="vbadge" title="Выполнено на стенде автора: занятие №15">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<div class="block" id="m3t9-1" data-dev="HQ-SRV|HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пакет borg"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="dev d-hq">HQ-CLI</span><span class="btitle">Пакет borg</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">apt-get</span> install <span class="o">-y</span> borg
-<span class="k">borg</span> <span class="o">--version</span></code></pre></div><div class="block vf" id="m3t9-2" data-dev="HQ-CLI" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пользователь borguser и каталог /backup"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Пользователь borguser и каталог /backup</span><span class="vbadge" title="Выполнено на стенде автора: занятие №15">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">borg</span> <span class="o">--version</span></code></pre></div><div class="block" id="m3t9-2" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Пользователь borguser и каталог /backup"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Пользователь borguser и каталог /backup</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">id</span> borguser <span class="op">&gt;/dev/null</span> 2&gt;&amp;1 <span class="op">||</span> <span class="k">useradd</span> <span class="o">-m</span> <span class="o">-s</span> /bin/bash borguser
 <span class="k">mkdir</span> <span class="o">-p</span> /backup <span class="op">&amp;&amp;</span> <span class="k">chown</span> borguser:borguser /backup <span class="op">&amp;&amp;</span> <span class="k">chmod</span> 700 /backup
 <span class="c"># если в sshd задан AllowUsers — добавить borguser</span>
 <span class="k">if</span> grep <span class="o">-q</span> <span class="s">&#x27;^AllowUsers&#x27;</span> /etc/openssh/sshd_config <span class="op">&amp;&amp;</span> <span class="k">!</span> grep <span class="o">-q</span> <span class="s">&#x27;^AllowUsers.*borguser&#x27;</span> /etc/openssh/sshd_config; <span class="k">then</span>
   <span class="k">sed</span> <span class="o">-i</span> <span class="s">&#x27;/^AllowUsers/ s/$/ borguser/&#x27;</span> /etc/openssh/sshd_config
   <span class="k">sshd</span> <span class="o">-t</span> <span class="op">&amp;&amp;</span> <span class="k">systemctl</span> restart sshd
-<span class="k">fi</span></code></pre></div><div class="block vf" id="m3t9-3" data-dev="HQ-SRV" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Ключ SSH и пароль репозитория"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Ключ SSH и пароль репозитория</span><span class="vbadge" title="Выполнено на стенде автора: занятие №15">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">fi</span></code></pre></div><div class="block" id="m3t9-3" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Ключ SSH и пароль репозитория"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Ключ SSH и пароль репозитория</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">[</span> <span class="o">-f</span> /root/.ssh/borg_key ] <span class="op">||</span> <span class="k">ssh-keygen</span> <span class="o">-t</span> ed25519 <span class="o">-N</span> <span class="s">&#x27;&#x27;</span> <span class="o">-f</span> /root/.ssh/borg_key
 <span class="k">echo</span> <span class="s">&#x27;<span class="v" data-k="PW">P@ssw0rd</span>&#x27;</span> <span class="op">&gt;</span> /root/.borg-pass <span class="op">&amp;&amp;</span> <span class="k">chmod</span> 600 /root/.borg-pass
-<span class="k">scp</span> <span class="o">-P</span> <span class="v" data-k="ANS_PORT">2027</span> /root/.ssh/borg_key.pub sshuser@<span class="v" data-k="HQ_CLI_IP">10.0.200.30</span>:/tmp/</code></pre></div><div class="block vf" id="m3t9-4" data-dev="HQ-CLI" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Ключ только для borg serve --append-only, репозиторий"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Ключ только для borg serve --append-only, репозиторий</span><span class="vbadge" title="Выполнено на стенде автора: занятие №15">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">scp</span> <span class="o">-P</span> <span class="v" data-k="ANS_PORT">2027</span> /root/.ssh/borg_key.pub sshuser@<span class="v" data-k="HQ_CLI_IP">10.0.200.30</span>:/tmp/</code></pre></div><div class="block" id="m3t9-4" data-dev="HQ-CLI" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Ключ только для borg serve --append-only, репозиторий"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-CLI</span><span class="btitle">Ключ только для borg serve --append-only, репозиторий</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">mkdir</span> <span class="o">-p</span> /home/borguser/.ssh
 <span class="k">grep</span> <span class="o">-qF</span> <span class="s">&quot;$(cut -d&#x27; &#x27; -f2 /tmp/borg_key.pub)&quot;</span> /home/borguser/.ssh/authorized_keys <span class="op">2&gt;/dev/null</span> <span class="op">||</span> <span class="k">\</span>
   echo <span class="s">&quot;command=\&quot;</span>borg serve <span class="o">--append-only</span> <span class="o">--restrict-to-path</span> /backup\<span class="s">&quot;,restrict $(cat /tmp/borg_key.pub)&quot;</span> <span class="op">&gt;&gt;</span> /home/borguser/.ssh/authorized_keys
 <span class="k">chown</span> <span class="o">-R</span> borguser:borguser /home/borguser/.ssh
 <span class="k">chmod</span> 700 /home/borguser/.ssh <span class="op">&amp;&amp;</span> <span class="k">chmod</span> 600 /home/borguser/.ssh/authorized_keys
-<span class="k">[</span> <span class="o">-d</span> /backup/hq-srv ] <span class="op">||</span> <span class="k">sudo</span> <span class="o">-u</span> borguser BORG_PASSPHRASE=<span class="s">&#x27;<span class="v" data-k="PW">P@ssw0rd</span>&#x27;</span> borg init <span class="o">--encryption=repokey</span> /backup/hq-srv</code></pre></div><div class="block vf" id="m3t9-5" data-dev="HQ-SRV" data-kind="cmd">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Скрипт и ежедневный таймер"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Скрипт и ежедневный таймер</span><span class="vbadge" title="Выполнено на стенде автора: занятие №15">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">[</span> <span class="o">-d</span> /backup/hq-srv ] <span class="op">||</span> <span class="k">sudo</span> <span class="o">-u</span> borguser BORG_PASSPHRASE=<span class="s">&#x27;<span class="v" data-k="PW">P@ssw0rd</span>&#x27;</span> borg init <span class="o">--encryption=repokey</span> /backup/hq-srv</code></pre></div><div class="block" id="m3t9-5" data-dev="HQ-SRV" data-kind="cmd">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Скрипт и ежедневный таймер"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Скрипт и ежедневный таймер</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">cat</span> <span class="op">&gt;</span> /usr/local/bin/backup-etc.sh <span class="op">&lt;&lt;</span> <span class="s">&#x27;EOF&#x27;</span>
 <span class="c">#!/bin/bash</span>
 <span class="p">export</span> BORG_RSH=&#x27;ssh -i /root/.ssh/borg_key -p <span class="v" data-k="ANS_PORT">2027</span> -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes&#x27;
@@ -447,8 +446,8 @@
 <span class="h">EOF</span>
 <span class="k">systemctl</span> daemon-reload <span class="op">&amp;&amp;</span> <span class="k">systemctl</span> enable <span class="o">--now</span> backup-etc.timer
 <span class="k">/usr/local/bin/backup-etc.sh</span>
-<span class="k">systemctl</span> list-timers backup-etc.timer</code></pre></div><div class="block chk vf" id="m3t9-6" data-dev="HQ-SRV" data-kind="check">
-<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка: список архивов и восстановление"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Проверка: список архивов и восстановление</span><span class="vbadge" title="Выполнено на стенде автора: занятие №15">✓ стенд</span></div><button class="copy" type="button">Копировать</button></div>
+<span class="k">systemctl</span> list-timers backup-etc.timer</code></pre></div><div class="block chk" id="m3t9-6" data-dev="HQ-SRV" data-kind="check">
+<div class="bh"><label class="done" title="Отметить как выполненное"><input type="checkbox" aria-label="Готово: Проверка: список архивов и восстановление"><span class="box" aria-hidden="true"></span></label><div class="bt"><span class="dev d-hq">HQ-SRV</span><span class="btitle">Проверка: список архивов и восстановление</span></div><button class="copy" type="button">Копировать</button></div>
 <pre><code><span class="k">export</span> BORG_RSH=<span class="s">&#x27;ssh -i /root/.ssh/borg_key -p <span class="v" data-k="ANS_PORT">2027</span> -o IdentitiesOnly=yes&#x27;</span>
 <span class="k">export</span> BORG_PASSCOMMAND=<span class="s">&#x27;cat /root/.borg-pass&#x27;</span>
 <span class="k">R=</span><span class="s">&#x27;ssh://borguser@<span class="v" data-k="HQ_CLI_IP">10.0.200.30</span>:<span class="v" data-k="ANS_PORT">2027</span>/backup/hq-srv&#x27;</span>

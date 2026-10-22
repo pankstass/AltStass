@@ -1,6 +1,5 @@
 <h2 id="docs">Документация сети</h2>
 <p class="lead">Все ВМ: <code>@ISP_WAN@</code> — NAT VirtualBox, <code>@MG_IF@</code> — Host-Only (управление с хоста). <span class="hint">Значения с подчёркиванием берутся из <button type="button" class="linkbtn" data-open-params>параметров сети</button>.</span></p>
-<div class="note"><b>Проверено по отчёту.</b> Метка <span class="vbadge">✓ стенд</span> стоит у блоков, решение которых выполнено на стенде автора в занятиях №4–9 (VLAN через etcnet, NAT в <code>/etc/nftables/nftables.nft</code>, GRE через <code>iptun</code>, OSPF с MD5, DHCP с override юнита, BIND в chroot). Добавлены проверки на типовые ошибки из отчёта: баннер, учётки, один маршрут по умолчанию, ключи хоста у клонов.</div>
 
 <h4 id="topology">Топология</h4>
 <div class="card topo">
@@ -143,8 +142,13 @@
 <tr><td></td><td class="m">@BR_LAN_IF@.@V_MGMT@</td><td class="m">@BR_GW_MGMT@</td><td class="m">—</td><td>VLAN @V_MGMT@ — управление</td></tr>
 <tr><td></td><td class="m">gre1</td><td class="m">@GRE_BR_CIDR@</td><td class="m">—</td><td>Туннель к HQ-RTR</td></tr>
 <tr><td><span class="dev d-br">BR-SRV</span></td><td class="m">@BR_SRV_IF@.@V_SRV@</td><td class="m">@BR_SRV_CIDR@</td><td class="m">@BR_GW_SRV_IP@</td><td><code>lab-core-br</code>, VLAN @V_SRV@</td></tr>
-<tr class="grp"><td colspan="5">Управление (@MG_IF@, Host-Only)</td></tr>
-<tr><td colspan="5" class="m wrap">HQ-RTR @MG_HQRTR_CIDR@ · HQ-SRV @MG_HQSRV_CIDR@ · HQ-CLI @MG_HQCLI_CIDR@ · ISP @MG_ISP_CIDR@ · BR-RTR @MG_BRRTR_CIDR@ · BR-SRV @MG_BRSRV_CIDR@</td></tr>
+<tr class="grp"><td colspan="5">Управление (Host-Only)</td></tr>
+<tr><td><span class="dev d-isp">ISP</span></td><td class="m">@MG_IF@</td><td class="m">@MG_ISP_CIDR@</td><td class="m">—</td><td>Host-Only, управление с хоста по SSH</td></tr>
+<tr><td><span class="dev d-hq">HQ-RTR</span></td><td class="m">@MG_IF@</td><td class="m">@MG_HQRTR_CIDR@</td><td class="m">—</td><td>Host-Only, управление с хоста по SSH</td></tr>
+<tr><td><span class="dev d-hq">HQ-SRV</span></td><td class="m">@MG_IF@</td><td class="m">@MG_HQSRV_CIDR@</td><td class="m">—</td><td>Host-Only, управление с хоста по SSH</td></tr>
+<tr><td><span class="dev d-hq">HQ-CLI</span></td><td class="m">@MG_IF@</td><td class="m">@MG_HQCLI_CIDR@</td><td class="m">—</td><td>Host-Only, управление с хоста по SSH</td></tr>
+<tr><td><span class="dev d-br">BR-RTR</span></td><td class="m">@MG_IF@</td><td class="m">@MG_BRRTR_CIDR@</td><td class="m">—</td><td>Host-Only, управление с хоста по SSH</td></tr>
+<tr><td><span class="dev d-br">BR-SRV</span></td><td class="m">@MG_IF@</td><td class="m">@MG_BRSRV_CIDR@</td><td class="m">—</td><td>Host-Only, управление с хоста по SSH</td></tr>
 </table></div>
 
 <h4 id="vlan">VLAN и подсети</h4>
